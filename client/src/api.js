@@ -54,6 +54,12 @@ export const api = {
   checkinWash: (body) => request('/washes/checkin', { method: 'POST', body: JSON.stringify(body) }),
   updateWashStatus: (id, status, afterPhoto = null) => 
     request(`/washes/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status, after_photo: afterPhoto }) }),
+  updateWashDetails: (id, body) =>
+    request(`/washes/${id}/details`, { method: 'PATCH', body: JSON.stringify(body) }),
+  archiveWash: (id) =>
+    request(`/washes/${id}/archive`, { method: 'POST' }),
+  clearAllDelivered: (dealerId) =>
+    request('/washes/clear-delivered', { method: 'POST', body: JSON.stringify({ dealer_id: dealerId }) }),
   updateInspection: (id, body) => request(`/washes/${id}/inspection`, { method: 'PATCH', body: JSON.stringify(body) }),
 
   // Customers

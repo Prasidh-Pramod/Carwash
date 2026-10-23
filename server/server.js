@@ -61,6 +61,14 @@ export function broadcastToTracker(washId, event, payload) {
 app.use(cors());
 app.use(express.json());
 
+// Handle malformed JSON body errors without crashing the server
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Malformed JSON payload received' });
+  }
+  next(err);
+});
+
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/dealers', dealersRouter);

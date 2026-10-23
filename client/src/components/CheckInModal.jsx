@@ -49,15 +49,17 @@ export default function CheckInModal({
 
   // Set default service
   useEffect(() => {
-    if (services && services.length > 0 && !selectedServiceId) {
+    if (services && services.length > 0 && (!selectedServiceId || !services.some(s => s.id === selectedServiceId))) {
       const defaultPkg = services.find(s => s.category === 'Package') || services[0];
       setSelectedServiceId(defaultPkg.id);
     }
   }, [services, selectedServiceId]);
 
-  // Set default customer
+  // Set default customer or auto-open new customer intake if none exist
   useEffect(() => {
-    if (customers && customers.length > 0 && !selectedCustomerId && !isCreatingNewCustomer) {
+    if (!customers || customers.length === 0) {
+      setIsCreatingNewCustomer(true);
+    } else if (!selectedCustomerId && !isCreatingNewCustomer) {
       setSelectedCustomerId(customers[0].id);
       if (customers[0].vehicles && customers[0].vehicles.length > 0) {
         setSelectedVehicleId(customers[0].vehicles[0].id);
@@ -101,30 +103,43 @@ export default function CheckInModal({
     setLoading(true);
     setError('');
 
+    const dealerId = dealer?.id || dealer?.dealer_id;
+    if (!dealerId) {
+      setError('Dealer profile not found. Please log in again.');
+      setLoading(false);
+      return;
+    }
+
     try {
       let custId = selectedCustomerId;
       let vehId = selectedVehicleId;
 
       // Handle inline new customer creation
       if (isCreatingNewCustomer) {
-        if (!newCustName || !newCustPhone || !newCustPlate) {
-          throw new Error('Name, Phone and License Plate are required for new customer');
+        if (!newCustName.trim()) {
+          throw new Error('Please enter customer full name.');
+        }
+        if (!newCustPhone.trim()) {
+          throw new Error('Please enter customer phone number.');
+        }
+        if (!newCustPlate.trim()) {
+          throw new Error('Please enter vehicle license plate.');
         }
 
         const resCust = await fetch('/api/customers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            dealer_id: dealer.id,
-            name: newCustName,
-            phone: newCustPhone,
+            dealer_id: dealerId,
+            name: newCustName.trim(),
+            phone: newCustPhone.trim(),
             is_subscribed: newCustSubscribed ? 1 : 0,
             subscription_plan: newCustSubscribed ? 'Gold Membership' : 'None',
             vehicles: [
               {
-                license_plate: newCustPlate,
-                make: newCustMake || 'Make',
-                model: newCustModel || 'Model'
+                license_plate: newCustPlate.trim().toUpperCase(),
+                make: newCustMake.trim() || 'Make',
+                model: newCustModel.trim() || 'Model'
               }
             ]
           })
@@ -134,11 +149,16 @@ export default function CheckInModal({
         if (!resCust.ok) throw new Error(createdCustData.error || 'Failed to create customer');
         
         custId = createdCustData.id;
-        vehId = createdCustData.vehicles[0].id;
+        vehId = createdCustData.vehicles?.[0]?.id;
       }
 
-      if (!custId || !vehId || !selectedServiceId) {
-        throw new Error('Please select customer, vehicle, and service package');
+      if (!custId || !vehId) {
+        throw new Error('Please select or create a customer and vehicle.');
+      }
+
+      const activeServiceId = selectedServiceId || (services && services[0]?.id);
+      if (!activeServiceId) {
+        throw new Error('Please select a wash service package.');
       }
 
       // Checkin vehicle
@@ -146,10 +166,10 @@ export default function CheckInModal({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          dealer_id: dealer.id,
+          dealer_id: dealerId,
           customer_id: custId,
           vehicle_id: vehId,
-          service_id: selectedServiceId,
+          service_id: activeServiceId,
           addons: selectedAddons,
           bay_number: Number(bayNumber),
           washer_staff: washerStaff,
@@ -171,9 +191,17 @@ export default function CheckInModal({
         });
       }
 
+      setNewCustName('');
+      setNewCustPhone('');
+      setNewCustPlate('');
+      setNewCustMake('');
+      setNewCustModel('');
+      setError('');
+
       onCheckInSuccess(data);
       onClose();
     } catch (err) {
+      console.error('CheckIn error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -184,11 +212,11 @@ export default function CheckInModal({
   const addonServices = services.filter(s => s.category === 'Addon');
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-slate-900 border border-slate-700 w-full max-w-2xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-800/40">
+        {/* Header (Always Visible at Top) */}
+        <div className="flex items-center justify-between px-6 py-3.5 border-b border-slate-800 bg-slate-800/60 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
               <Car className="w-4 h-4" />
@@ -206,28 +234,52 @@ export default function CheckInModal({
           </button>
         </div>
 
-        {error && (
-          <div className="mx-6 mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        {/* Form with Scrollable Content & Sticky Footer */}
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          
+          {/* Scrollable Form Body */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            {error && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
           
           {/* Customer Selection or Inline Add */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-brand-400" />
-                <span>Customer & Vehicle</span>
-              </label>
+            {/* Segmented Switcher */}
+            <div className="bg-slate-800/90 p-1 rounded-xl flex items-center border border-slate-700/80 gap-1">
               <button
                 type="button"
-                onClick={() => setIsCreatingNewCustomer(!isCreatingNewCustomer)}
-                className="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1"
+                onClick={() => {
+                  setIsCreatingNewCustomer(false);
+                  setError('');
+                }}
+                disabled={customers.length === 0}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition ${
+                  !isCreatingNewCustomer
+                    ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed'
+                }`}
               >
-                {isCreatingNewCustomer ? 'Select Existing Customer' : '+ New Customer Intake'}
+                <User className="w-3.5 h-3.5" />
+                <span>Existing Customer ({customers.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCreatingNewCustomer(true);
+                  setError('');
+                }}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition ${
+                  isCreatingNewCustomer
+                    ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ Add New Customer</span>
               </button>
             </div>
 
@@ -278,61 +330,80 @@ export default function CheckInModal({
               </div>
             ) : (
               /* Inline New Customer Form */
-              <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/80 space-y-3">
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="text"
-                    placeholder="Full Name"
-                    value={newCustName}
-                    onChange={(e) => setNewCustName(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                  />
-                  <input
-                    type="text"
-                    placeholder="WhatsApp Phone (e.g. +1 555...)"
-                    value={newCustPhone}
-                    onChange={(e) => setNewCustPhone(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                  />
+              <div className="p-3.5 bg-slate-800/80 rounded-xl border border-brand-500/30 space-y-3">
+                <div className="text-[11px] font-bold text-brand-300 flex items-center gap-1.5 pb-1 border-b border-slate-700/60">
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Enter New Customer & Vehicle Details:</span>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <input
-                    type="text"
-                    placeholder="License Plate"
-                    value={newCustPlate}
-                    onChange={(e) => setNewCustPlate(e.target.value.toUpperCase())}
-                    className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono uppercase"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Make (e.g. Toyota)"
-                    value={newCustMake}
-                    onChange={(e) => setNewCustMake(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Model (e.g. RAV4)"
-                    value={newCustModel}
-                    onChange={(e) => setNewCustModel(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">Customer Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Alex Johnson"
+                      value={newCustName}
+                      onChange={(e) => setNewCustName(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">WhatsApp Phone *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. +1 555-234-5678"
+                      value={newCustPhone}
+                      onChange={(e) => setNewCustPhone(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
                 </div>
-                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">License Plate *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 7XYZ99"
+                      value={newCustPlate}
+                      onChange={(e) => setNewCustPlate(e.target.value.toUpperCase())}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono uppercase focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">Car Make</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Honda"
+                      value={newCustMake}
+                      onChange={(e) => setNewCustMake(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">Car Model</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Civic"
+                      value={newCustModel}
+                      onChange={(e) => setNewCustModel(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300 pt-1">
                   <input
                     type="checkbox"
                     checked={newCustSubscribed}
                     onChange={(e) => setNewCustSubscribed(e.target.checked)}
                     className="rounded border-slate-700 text-brand-500 focus:ring-0"
                   />
-                  <span>Enroll in Membership Subscription (Eligible for Loyalty Perks)</span>
+                  <span>Enroll in Loyalty Membership Subscription (Unlocks Free Wash Perks)</span>
                 </label>
               </div>
             )}
           </div>
 
           {/* LOYALTY CALLOUT / PROMO STATUS (4TH WASH FREE!) */}
-          {customerLoyalty && (
+          {!isCreatingNewCustomer && customerLoyalty && (
             <div className={`p-3.5 rounded-xl border transition ${
               isEligibleForFreeWash 
                 ? 'bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border-amber-500/50 text-amber-200'
@@ -533,22 +604,46 @@ export default function CheckInModal({
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-500 to-cyan-500 hover:from-brand-600 hover:to-cyan-600 text-white shadow-lg shadow-brand-500/25 transition active:scale-95 disabled:opacity-50"
-            >
-              {loading ? 'Checking in...' : 'Confirm Intake & Generate Ticket'}
-            </button>
+          {/* Bottom Error Display */}
+          {error && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          </div> {/* End Scrollable Form Body */}
+
+          {/* Sticky Footer Action Bar (Always Visible at Bottom of Modal) */}
+          <div className="px-6 py-3.5 border-t border-slate-800 bg-slate-900/95 backdrop-blur shrink-0 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-slate-400">Total:</span>
+              <span className="text-base font-mono font-extrabold text-white">
+                {dealer.currency}{finalTotal.toFixed(2)}
+              </span>
+              {isEligibleForFreeWash && (
+                <span className="bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full uppercase">
+                  100% Free
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-500 to-cyan-500 hover:from-brand-600 hover:to-cyan-600 text-white shadow-lg shadow-brand-500/25 transition active:scale-95 disabled:opacity-50"
+              >
+                {loading ? 'Checking in...' : 'Confirm Intake & Generate Ticket'}
+              </button>
+            </div>
           </div>
 
         </form>

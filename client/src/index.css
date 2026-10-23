@@ -37,3 +37,37 @@
 .glow-active {
   animation: pulseGlow 2.5s infinite ease-in-out;
 }
+
+@media print {
+  /* Complete isolation of print area: hide background app */
+  nav,
+  main,
+  aside,
+  header,
+  footer,
+  #root > *:not(.fixed),
+  .print-hidden,
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Force clean page breaks between duplicate receipt copies */
+  .receipt-copy {
+    page-break-after: always !important;
+    break-after: page !important;
+    margin: 0 !important;
+    padding: 20px 0 !important;
+  }
+
+  .receipt-copy:last-child {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+}

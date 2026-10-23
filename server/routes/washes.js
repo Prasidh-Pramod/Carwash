@@ -54,6 +54,8 @@ router.get('/', (req, res) => {
     if (status) {
       query += ` AND w.status = ?`;
       params.push(status);
+    } else {
+      query += ` AND w.status != 'ARCHIVED'`;
     }
 
     query += ` ORDER BY w.queue_time DESC`;
@@ -295,11 +297,13 @@ router.patch('/:id/status', async (req, res) => {
       waType = 'IN_WASH';
     } else if (status === 'QUALITY_CHECK') {
       timeColumnUpdate = ', quality_check_time = CURRENT_TIMESTAMP';
+      waType = 'QUALITY_CHECK';
     } else if (status === 'COMPLETED') {
       timeColumnUpdate = ', completed_time = CURRENT_TIMESTAMP';
       waType = 'COMPLETED';
     } else if (status === 'DELIVERED') {
       timeColumnUpdate = ', delivered_time = CURRENT_TIMESTAMP';
+      waType = 'DELIVERED';
       
       // Update customer total washes tally and vehicle wash count
       db.prepare('UPDATE customers SET total_washes = total_washes + 1 WHERE id = ?').run(wash.customer_id);
@@ -338,6 +342,8 @@ router.patch('/:id/status', async (req, res) => {
         invoiceNumber: wash.invoice_number,
         totalAmount: wash.invoice_total,
         messageType: waType,
+        isFreeWash: Boolean(wash.is_free_wash),
+        freeReason: wash.free_wash_reason || '',
         afterPhoto: after_photo || wash.after_photo
       });
     }
@@ -372,6 +378,69 @@ router.patch('/:id/inspection', (req, res) => {
 
     const updated = db.prepare('SELECT * FROM washes WHERE id = ?').get(req.params.id);
     res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update bay number and technician staff
+router.patch('/:id/details', (req, res) => {
+  try {
+    const washId = req.params.id;
+    const { bay_number, washer_staff } = req.body;
+    const wash = db.prepare('SELECT * FROM washes WHERE id = ?').get(washId);
+    if (!wash) return res.status(404).json({ error: 'Wash not found' });
+
+    db.prepare(`
+      UPDATE washes 
+      SET bay_number = COALESCE(?, bay_number),
+          washer_staff = COALESCE(?, washer_staff)
+      WHERE id = ?
+    `).run(bay_number ? Number(bay_number) : null, washer_staff || null, washId);
+
+    const updated = db.prepare(`
+      SELECT w.*, c.name as customer_name, c.phone as customer_phone,
+             v.license_plate, v.make as vehicle_make, v.model as vehicle_model,
+             i.id as invoice_id, i.invoice_number, i.total as invoice_total
+      FROM washes w
+      JOIN customers c ON c.id = w.customer_id
+      JOIN vehicles v ON v.id = w.vehicle_id
+      LEFT JOIN invoices i ON i.wash_id = w.id
+      WHERE w.id = ?
+    `).get(washId);
+
+    broadcastToCarwash(wash.dealer_id, 'wash:updated', { wash: updated });
+    broadcastToTracker(washId, 'tracker:status_changed', { wash: updated });
+    res.json({ message: 'Wash details updated successfully', wash: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Dismiss / Archive a single delivered wash from active bays
+router.post('/:id/archive', (req, res) => {
+  try {
+    const washId = req.params.id;
+    const wash = db.prepare('SELECT * FROM washes WHERE id = ?').get(washId);
+    if (!wash) return res.status(404).json({ error: 'Wash not found' });
+
+    db.prepare(`UPDATE washes SET status = 'ARCHIVED' WHERE id = ?`).run(washId);
+    broadcastToCarwash(wash.dealer_id, 'wash:archived', { washId });
+    res.json({ message: 'Wash cleared from bays successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Clear all delivered washes for a dealer in one click
+router.post('/clear-delivered', (req, res) => {
+  try {
+    const { dealer_id } = req.body;
+    if (!dealer_id) return res.status(400).json({ error: 'dealer_id is required' });
+
+    db.prepare(`UPDATE washes SET status = 'ARCHIVED' WHERE dealer_id = ? AND status = 'DELIVERED'`).run(dealer_id);
+    broadcastToCarwash(dealer_id, 'wash:cleared', { dealer_id });
+    res.json({ message: 'All delivered washes cleared from bays successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

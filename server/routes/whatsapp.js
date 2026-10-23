@@ -55,6 +55,17 @@ export async function sendWhatsAppNotification({
         `📲 Follow live stage updates: ${trackUrl}`;
       break;
 
+    case 'QUALITY_CHECK':
+      messageBody = `🔍 *Vehicle Detail & Quality Inspection*\n` +
+        `------------------------------------\n` +
+        `Hello *${customerName}*,\n` +
+        `Your *${carModel}* [${licensePlate}] has completed its wash cycle and is now undergoing our *Detail & Quality Inspection* at *${dealerName}*.\n\n` +
+        `✨ Current Step: Hand drying, tire dressing & spot inspection\n` +
+        `📍 Station: Bay #${bayNumber || 1} Detail Lane\n` +
+        `⏱ Estimated pickup in: 5-10 minutes\n\n` +
+        `📲 Follow live stage updates: ${trackUrl}`;
+      break;
+
     case 'COMPLETED':
       messageBody = `✨ *Your Car is Clean & Ready for Pickup!* ✨\n` +
         `------------------------------------\n` +
@@ -65,6 +76,18 @@ export async function sendWhatsAppNotification({
         (afterPhoto ? `📸 View finished shine photo: ${afterPhoto}\n` : '') +
         `\n📄 *View / Download Your Invoice:* \n${invoiceUrl}\n\n` +
         `Thank you for trusting *${dealerName}*! Drive safely! 🚗💨`;
+      break;
+
+    case 'DELIVERED':
+      messageBody = `🚗💨 *Vehicle Handover & Settlement Complete*\n` +
+        `------------------------------------\n` +
+        `Dear *${customerName}*,\n` +
+        `Thank you for visiting *${dealerName}*! Your *${carModel}* [${licensePlate}] has been settled and handed over.\n\n` +
+        `• Service: *${serviceName}*\n` +
+        `• Status: *Settled & Delivered*\n` +
+        (isFreeWash ? `• Loyalty Discount: 100% Free 4th Wash applied! 🎁\n` : '') +
+        `\n📄 *Official Itemized Receipt:* \n${invoiceUrl}\n\n` +
+        `We appreciate your business! Drive safely and see you next time! ⭐⭐⭐⭐⭐`;
       break;
 
     case 'INVOICE':

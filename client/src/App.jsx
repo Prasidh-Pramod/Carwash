@@ -112,6 +112,15 @@ export default function App() {
     // Real-time: Wash Status Updated (by bay staff or any device)
     socket.on('wash:updated', (payload) => {
       setWashes(prev => prev.map(w => w.id === payload.wash.id ? { ...w, ...payload.wash } : w));
+      api.getWhatsAppLogs(currentCarwash.id).then(setWhatsappLogs);
+    });
+
+    socket.on('wash:archived', () => {
+      loadCarwashData(currentCarwash.id);
+    });
+
+    socket.on('wash:cleared', () => {
+      loadCarwashData(currentCarwash.id);
     });
 
     // Real-time: New Car Intake Checked In
@@ -163,6 +172,33 @@ export default function App() {
     }
   };
 
+  const handleUpdateWashDetails = async (washId, body) => {
+    try {
+      await api.updateWashDetails(washId, body);
+      await loadCarwashData(currentCarwash.id);
+    } catch (err) {
+      alert(`Error updating bay/staff: ${err.message}`);
+    }
+  };
+
+  const handleArchiveWash = async (washId) => {
+    try {
+      await api.archiveWash(washId);
+      await loadCarwashData(currentCarwash.id);
+    } catch (err) {
+      alert(`Error clearing wash from bay: ${err.message}`);
+    }
+  };
+
+  const handleClearAllDelivered = async () => {
+    try {
+      await api.clearAllDelivered(currentCarwash.id);
+      await loadCarwashData(currentCarwash.id);
+    } catch (err) {
+      alert(`Error clearing delivered washes: ${err.message}`);
+    }
+  };
+
   const handleOpenInvoiceByWashId = async (washId) => {
     try {
       const inv = invoices.find(i => i.wash_id === washId);
@@ -187,7 +223,7 @@ export default function App() {
         customer_id: wash.customer_id,
         customer_name: wash.customer_name,
         customer_phone: wash.customer_phone,
-        message_type: wash.status === 'COMPLETED' ? 'COMPLETED' : 'IN_WASH'
+        message_type: wash.status || 'CUSTOM'
       });
       const logs = await api.getWhatsAppLogs(currentCarwash.id);
       setWhatsappLogs(logs);
@@ -307,6 +343,9 @@ export default function App() {
                 onStatusChange={handleStatusChange}
                 onOpenInvoice={handleOpenInvoiceByWashId}
                 onSendWhatsApp={handleSendWhatsAppQuick}
+                onUpdateWashDetails={handleUpdateWashDetails}
+                onArchiveWash={handleArchiveWash}
+                onClearAllDelivered={handleClearAllDelivered}
                 dealer={currentCarwash}
               />
             )}

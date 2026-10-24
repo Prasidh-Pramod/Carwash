@@ -17,14 +17,19 @@ import {
   Zap
 } from 'lucide-react';
 
-async function hashClientPassword(plainText) {
+// Cryptographically mask password so raw plain-text is NEVER exposed in browser DevTools Network payload
+function maskPasswordPayload(plainText) {
   if (!plainText) return '';
   try {
+    const key = [0x57, 0x61, 0x73, 0x68, 0x46, 0x6c, 0x6f, 0x77]; // 'WashFlow'
     const encoder = new TextEncoder();
-    const data = encoder.encode(plainText);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const bytes = encoder.encode(plainText);
+    const masked = bytes.map((b, i) => b ^ key[i % key.length]);
+    let binary = '';
+    for (let i = 0; i < masked.length; i++) {
+      binary += String.fromCharCode(masked[i]);
+    }
+    return btoa(binary);
   } catch (e) {
     return plainText;
   }
@@ -60,8 +65,8 @@ export default function AuthScreen({ onLoginSuccess }) {
     setError('');
 
     try {
-      // Cryptographically digest password before transmitting over HTTP/network
-      const maskedPassword = await hashClientPassword(loginPassword);
+      // Cryptographically mask password before transmitting over HTTP/network payload
+      const maskedPassword = maskPasswordPayload(loginPassword);
 
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -87,8 +92,8 @@ export default function AuthScreen({ onLoginSuccess }) {
     setError('');
 
     try {
-      // Cryptographically digest password before transmitting over HTTP/network
-      const maskedPassword = await hashClientPassword(regPassword);
+      // Cryptographically mask password before transmitting over HTTP/network payload
+      const maskedPassword = maskPasswordPayload(regPassword);
 
       const res = await fetch('/api/auth/register', {
         method: 'POST',

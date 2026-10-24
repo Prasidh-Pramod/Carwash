@@ -26,6 +26,19 @@ function seedDefaultServicesForCarwash(dealerId) {
   }
 }
 
+// Helper to decode masked password payload from client
+function decodePasswordPayload(payload) {
+  if (!payload || typeof payload !== 'string') return payload;
+  try {
+    const raw = Buffer.from(payload, 'base64');
+    const key = [0x57, 0x61, 0x73, 0x68, 0x46, 0x6c, 0x6f, 0x77];
+    const unmasked = Buffer.from(raw.map((b, i) => b ^ key[i % key.length])).toString('utf-8');
+    return unmasked || payload;
+  } catch (e) {
+    return payload;
+  }
+}
+
 // 1. Login
 router.post('/login', (req, res) => {
   try {
@@ -41,18 +54,17 @@ router.post('/login', (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    let isMatch = bcrypt.compareSync(password, user.password_hash);
+    const unmasked = decodePasswordPayload(password);
+
+    // Support both masked payload, direct raw password, and legacy hashes
+    let isMatch = bcrypt.compareSync(unmasked, user.password_hash) || 
+                  bcrypt.compareSync(password, user.password_hash);
     
-    // Support client-side SHA-256 masked passwords for pre-existing seed accounts
+    // Fallback for default seed accounts
     if (!isMatch) {
       const shaDefault = crypto.createHash('sha256').update('Password123!').digest('hex');
-      if (password === shaDefault && bcrypt.compareSync('Password123!', user.password_hash)) {
+      if ((password === shaDefault || unmasked === shaDefault) && bcrypt.compareSync('Password123!', user.password_hash)) {
         isMatch = true;
-        // Upgrade stored hash to client-masked hash
-        db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(
-          bcrypt.hashSync(password, 10),
-          user.id
-        );
       }
     }
 
@@ -111,9 +123,10 @@ router.post('/register', (req, res) => {
       return res.status(400).json({ error: 'An account with this email already exists' });
     }
 
+    const unmasked = decodePasswordPayload(password);
+    const passwordHash = bcrypt.hashSync(unmasked, 10);
+
     const dealerId = `dealer_${Date.now()}`;
-    const userId = `usr_${Date.now()}`;
-    const passwordHash = bcrypt.hashSync(password, 10);
 
     // Create Carwash Dealership record
     db.prepare(`

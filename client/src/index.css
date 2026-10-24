@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-[#0B0F19] text-slate-100 min-h-screen selection:bg-blue-600 selection:text-white;
+    @apply bg-[#F8FAFC] text-slate-900 min-h-screen selection:bg-blue-600 selection:text-white;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-tap-highlight-color: transparent;
   }
@@ -16,14 +16,14 @@
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(11, 15, 25, 0.7);
+  background: rgba(241, 245, 249, 0.8);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.4);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(148, 163, 184, 0.6);
 }
 
 /* Hide scrollbar for clean touch carousels */

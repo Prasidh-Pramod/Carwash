@@ -10,9 +10,7 @@ import {
   BarChart3,
   Sparkles,
   Download,
-  Zap,
-  Menu,
-  X
+  Zap
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -39,7 +37,6 @@ export default function Navbar({
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Check if already in standalone PWA mode
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
       setIsInstallable(false);
     }
@@ -72,7 +69,7 @@ export default function Navbar({
   return (
     <>
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-[#111827]/95 backdrop-blur border-b border-slate-800 text-white select-none">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 text-slate-800 shadow-xs select-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-3">
             
@@ -83,14 +80,14 @@ export default function Navbar({
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm sm:text-base tracking-tight text-white truncate max-w-[150px] sm:max-w-xs">
+                  <span className="font-bold text-sm sm:text-base tracking-tight text-slate-900 truncate max-w-[150px] sm:max-w-xs">
                     {carwash?.name || 'WashFlow Facility'}
                   </span>
-                  <span className="hidden sm:inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-mono font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <span className="hidden sm:inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-mono font-medium bg-blue-50 text-blue-700 border border-blue-200">
                     PRO
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 truncate">
+                <p className="text-[11px] text-slate-500 truncate">
                   {carwash?.city ? `${carwash.city} • ` : ''}Managed by {user?.name || 'Owner'}
                 </p>
               </div>
@@ -102,10 +99,10 @@ export default function Navbar({
               {/* Pitch Deck / Commercial Showcase */}
               <button
                 onClick={onOpenPitchModal}
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition"
                 title="Open Commercial Pitch & Value Overview"
               >
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <Zap className="w-3.5 h-3.5 text-amber-500" />
                 <span>Why WashFlow?</span>
               </button>
 
@@ -113,7 +110,7 @@ export default function Navbar({
               {isInstallable && (
                 <button
                   onClick={handleInstallClick}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30 hover:bg-blue-500/20 transition"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition"
                   title="Install WashFlow App onto device"
                 >
                   <Download className="w-3.5 h-3.5" />
@@ -124,30 +121,30 @@ export default function Navbar({
               {/* WhatsApp Drawer Trigger */}
               <button
                 onClick={onToggleWhatsAppDrawer}
-                className="relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/40 transition"
+                className="relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition"
                 title="Open Live WhatsApp Notification Simulator"
               >
-                <Smartphone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span className="hidden md:inline">WhatsApp Logs</span>
                 {unreadWaCount > 0 && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 )}
               </button>
 
               {/* Check-In Car (Prominent) */}
               <button
                 onClick={onOpenCheckIn}
-                className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-sm transition active:scale-95"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span className="hidden xs:inline font-bold">Check-In</span>
-                <span className="hidden sm:inline font-bold">Vehicle</span>
+                <span className="hidden xs:inline">Check-In</span>
+                <span className="hidden sm:inline">Vehicle</span>
               </button>
 
               {/* Sign Out */}
               <button
                 onClick={onLogout}
-                className="p-2 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-rose-300 hover:bg-rose-950/20 transition flex items-center gap-1 border border-transparent hover:border-rose-500/20"
+                className="p-2 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition flex items-center gap-1 border border-transparent hover:border-rose-200"
                 title="Sign Out"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -158,8 +155,8 @@ export default function Navbar({
 
           </div>
 
-          {/* Desktop Navigation Tabs (Hidden on small mobile screens) */}
-          <nav className="hidden md:flex space-x-1 border-t border-slate-800/80 pt-1.5 pb-2 text-xs overflow-x-auto">
+          {/* Desktop Navigation Tabs */}
+          <nav className="hidden md:flex space-x-1 border-t border-slate-100 pt-1.5 pb-2 text-xs overflow-x-auto">
             {navItems.map(item => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -169,8 +166,8 @@ export default function Navbar({
                   onClick={() => setActiveTab(item.id)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium transition whitespace-nowrap ${
                     isActive
-                      ? 'bg-slate-800 text-blue-400 font-semibold border border-slate-700/80 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                      ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -182,14 +179,14 @@ export default function Navbar({
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation Bar (PWA Experience for Phones) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#111827]/95 backdrop-blur border-t border-slate-800/90 flex items-center justify-around px-2 py-1.5 text-[10px] pb-[max(0.375rem,env(safe-area-inset-bottom))] shadow-2xl select-none">
+      {/* Mobile Bottom Navigation Bar (PWA Experience) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 flex items-center justify-around px-2 py-1.5 text-[10px] pb-[max(0.375rem,env(safe-area-inset-bottom))] shadow-xl select-none">
         
         {/* Bays */}
         <button
           onClick={() => setActiveTab('washes')}
           className={`flex flex-col items-center gap-0.5 p-1 rounded-lg transition ${
-            activeTab === 'washes' ? 'text-blue-400 font-bold' : 'text-slate-400'
+            activeTab === 'washes' ? 'text-blue-600 font-bold' : 'text-slate-500'
           }`}
         >
           <Car className="w-4 h-4" />
@@ -200,7 +197,7 @@ export default function Navbar({
         <button
           onClick={() => setActiveTab('analytics')}
           className={`flex flex-col items-center gap-0.5 p-1 rounded-lg transition ${
-            activeTab === 'analytics' ? 'text-blue-400 font-bold' : 'text-slate-400'
+            activeTab === 'analytics' ? 'text-blue-600 font-bold' : 'text-slate-500'
           }`}
         >
           <BarChart3 className="w-4 h-4" />
@@ -210,7 +207,7 @@ export default function Navbar({
         {/* Centered Elevated Check-In Button */}
         <button
           onClick={onOpenCheckIn}
-          className="flex flex-col items-center justify-center -mt-4 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/40 border-2 border-[#111827] active:scale-95 transition"
+          className="flex flex-col items-center justify-center -mt-4 w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30 border-2 border-white active:scale-95 transition"
           title="Check-in Vehicle"
         >
           <Plus className="w-6 h-6" />
@@ -220,7 +217,7 @@ export default function Navbar({
         <button
           onClick={() => setActiveTab('invoices')}
           className={`flex flex-col items-center gap-0.5 p-1 rounded-lg transition ${
-            activeTab === 'invoices' ? 'text-blue-400 font-bold' : 'text-slate-400'
+            activeTab === 'invoices' ? 'text-blue-600 font-bold' : 'text-slate-500'
           }`}
         >
           <Receipt className="w-4 h-4" />
@@ -231,7 +228,7 @@ export default function Navbar({
         <button
           onClick={() => setActiveTab(activeTab === 'customers' ? 'settings' : 'customers')}
           className={`flex flex-col items-center gap-0.5 p-1 rounded-lg transition ${
-            activeTab === 'customers' || activeTab === 'settings' ? 'text-blue-400 font-bold' : 'text-slate-400'
+            activeTab === 'customers' || activeTab === 'settings' ? 'text-blue-600 font-bold' : 'text-slate-500'
           }`}
         >
           <Users className="w-4 h-4" />

@@ -33,15 +33,15 @@ export default function CustomersView({
     <div className="space-y-6">
       
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-extrabold text-white">Customer & Multi-Vehicle Hub</h1>
-            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/30">
+            <h1 className="text-xl font-bold text-slate-900">Customer & Multi-Vehicle Hub</h1>
+            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
               {customers.length} Members
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Manage multi-vehicle profiles and track 4th wash free loyalty progression.
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function CustomersView({
             placeholder="Search name, phone, license plate..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-brand-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition"
           />
         </div>
       </div>
@@ -71,28 +71,28 @@ export default function CustomersView({
           return (
             <div 
               key={cust.id} 
-              className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition hover:border-slate-600"
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between transition hover:border-slate-300 hover:shadow-sm"
             >
               {/* Top Row: Info & Subscription Badge */}
               <div>
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-base font-bold text-white">{cust.name}</h3>
+                      <h3 className="text-base font-bold text-slate-900">{cust.name}</h3>
                       {isSub ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                          <Crown className="w-3 h-3 text-amber-400" />
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                          <Crown className="w-3 h-3 text-amber-600" />
                           {cust.subscription_plan || 'Subscribed Member'}
                         </span>
                       ) : (
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                           Non-Subscribed
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
                       <span className="flex items-center gap-1">
-                        <Phone className="w-3 h-3 text-emerald-400" />
+                        <Phone className="w-3 h-3 text-emerald-600" />
                         {cust.phone}
                       </span>
                       {cust.email && (
@@ -106,7 +106,7 @@ export default function CustomersView({
 
                   <button
                     onClick={() => onCheckInCustomer(cust)}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-brand-500/20 hover:bg-brand-500 text-brand-300 hover:text-white border border-brand-500/40 transition"
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition"
                   >
                     + Check-In
                   </button>
@@ -116,41 +116,41 @@ export default function CustomersView({
                 {dealer.has_fourth_wash_promo ? (
                   <div className={`p-3 rounded-xl border mb-4 text-xs transition ${
                     isEligible 
-                      ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border-amber-500/50 text-amber-200' 
-                      : 'bg-slate-900/60 border-slate-700/60 text-slate-300'
+                      ? 'bg-amber-50/70 border-amber-200 text-amber-900' 
+                      : 'bg-slate-50 border-slate-200 text-slate-700'
                   }`}>
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-1.5 font-bold">
-                        <Flame className={`w-3.5 h-3.5 ${isEligible ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`} />
+                        <Flame className={`w-3.5 h-3.5 ${isEligible ? 'text-amber-600 animate-pulse' : 'text-slate-400'}`} />
                         <span>Loyalty Status: 4th Wash Free Perk</span>
                       </div>
-                      <span className="font-mono text-[11px] text-slate-400">
+                      <span className="font-mono text-[11px] text-slate-500">
                         {completedWashes} washes completed
                       </span>
                     </div>
 
-                    <p className="text-[11px] leading-relaxed opacity-90">
+                    <p className="text-[11px] leading-relaxed text-slate-600">
                       {loyalty.reason}
                     </p>
 
                     {/* Progress indicators: 1) Subscribed? 2) >= 2 Vehicles? 3) Wash counter */}
-                    <div className="grid grid-cols-3 gap-1.5 mt-2.5 pt-2 border-t border-slate-700/40 text-[10px]">
-                      <div className={`px-2 py-1 rounded flex items-center gap-1 ${isSub ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'}`}>
+                    <div className="grid grid-cols-3 gap-1.5 mt-2.5 pt-2 border-t border-slate-200/80 text-[10px]">
+                      <div className={`px-2 py-1 rounded flex items-center gap-1 border ${isSub ? 'bg-emerald-50 text-emerald-800 border-emerald-200 font-medium' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                         <CheckCircle2 className="w-3 h-3" />
                         <span>Subscribed</span>
                       </div>
-                      <div className={`px-2 py-1 rounded flex items-center gap-1 ${vehicleCount >= 2 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'}`}>
+                      <div className={`px-2 py-1 rounded flex items-center gap-1 border ${vehicleCount >= 2 ? 'bg-emerald-50 text-emerald-800 border-emerald-200 font-medium' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                         <CheckCircle2 className="w-3 h-3" />
                         <span>2+ Cars ({vehicleCount}/2)</span>
                       </div>
-                      <div className={`px-2 py-1 rounded flex items-center gap-1 ${loyalty.isFourthWashMultiple ? 'bg-amber-500/20 text-amber-300 font-bold' : 'bg-slate-800 text-slate-400'}`}>
+                      <div className={`px-2 py-1 rounded flex items-center gap-1 border ${loyalty.isFourthWashMultiple ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                         <CheckCircle2 className="w-3 h-3" />
                         <span>Next: Wash #{loyalty.nextWashNumber}</span>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800 mb-4 text-xs text-slate-400">
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 mb-4 text-xs text-slate-500">
                     Standard Dealer Tier • {completedWashes} total washes
                   </div>
                 )}
@@ -158,13 +158,13 @@ export default function CustomersView({
                 {/* Vehicles List */}
                 <div className="space-y-2 mb-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                      <Car className="w-3.5 h-3.5 text-brand-400" />
+                    <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                      <Car className="w-3.5 h-3.5 text-blue-600" />
                       <span>Enrolled Vehicles ({vehicleCount})</span>
                     </span>
                     <button
                       onClick={() => onOpenAddVehicle(cust)}
-                      className="text-[11px] text-brand-400 hover:text-brand-300 font-medium flex items-center gap-0.5"
+                      className="text-[11px] text-blue-600 hover:text-blue-700 font-medium flex items-center gap-0.5"
                     >
                       <Plus className="w-3 h-3" /> Add Vehicle
                     </button>
@@ -175,27 +175,27 @@ export default function CustomersView({
                       cust.vehicles.map(v => (
                         <div 
                           key={v.id} 
-                          className="bg-slate-900/70 border border-slate-700/60 rounded-xl p-2.5 flex items-center justify-between"
+                          className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center justify-between"
                         >
                           <div>
-                            <span className="bg-slate-950 text-amber-300 font-mono font-bold text-xs px-2 py-0.5 rounded border border-slate-700 inline-block mb-1">
+                            <span className="bg-slate-900 text-amber-300 font-mono font-bold text-xs px-2 py-0.5 rounded border border-slate-800 shadow-xs inline-block mb-1">
                               {v.license_plate}
                             </span>
-                            <div className="text-xs text-slate-200 font-medium">
+                            <div className="text-xs text-slate-800 font-semibold">
                               {v.make} {v.model}
                             </div>
-                            <div className="text-[10px] text-slate-400">
+                            <div className="text-[10px] text-slate-500">
                               {v.color} • {v.vehicle_type}
                             </div>
                           </div>
                           <div className="text-right">
-                            <span className="text-[10px] text-slate-400 block">Washes</span>
-                            <span className="text-xs font-mono font-bold text-brand-400">{v.wash_count || 0}</span>
+                            <span className="text-[10px] text-slate-500 block font-medium">Washes</span>
+                            <span className="text-xs font-mono font-bold text-blue-600">{v.wash_count || 0}</span>
                           </div>
                         </div>
                       ))
                     ) : (
-                      <div className="col-span-2 py-3 text-center text-xs text-slate-500 border border-dashed border-slate-700 rounded-xl">
+                      <div className="col-span-2 py-3 text-center text-xs text-slate-500 border border-dashed border-slate-300 rounded-xl bg-slate-50/50">
                         No vehicles added yet
                       </div>
                     )}
@@ -204,16 +204,16 @@ export default function CustomersView({
               </div>
 
               {/* Bottom Actions: Toggle Subscription */}
-              <div className="pt-3 border-t border-slate-700/60 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-500 font-medium">
                   {isSub ? 'Subscription: Active' : 'Subscription: Inactive'}
                 </span>
                 <button
                   onClick={() => onToggleSubscription(cust.id, !isSub)}
-                  className={`text-xs px-3 py-1.5 rounded-lg font-medium transition ${
+                  className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition ${
                     isSub
-                      ? 'bg-slate-700/60 hover:bg-slate-700 text-slate-300'
-                      : 'bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40'
+                      ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                   }`}
                 >
                   {isSub ? 'Cancel Subscription' : '★ Upgrade to Subscribed Member'}

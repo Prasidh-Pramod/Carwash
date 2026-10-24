@@ -39,18 +39,18 @@ export default function WhatsAppPhoneSimulator({
   };
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[450px] bg-slate-950 border-l border-slate-800 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[450px] bg-white border-l border-slate-200 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
       
       {/* Top Bar */}
-      <div className="p-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+      <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Smartphone className="w-5 h-5 text-emerald-400" />
+          <Smartphone className="w-5 h-5 text-emerald-600" />
           <div>
-            <h3 className="text-sm font-bold text-white">WhatsApp Live Simulator</h3>
-            <p className="text-[11px] text-slate-400">Real-time inspection of customer messages</p>
+            <h3 className="text-sm font-bold text-slate-900">WhatsApp Live Simulator</h3>
+            <p className="text-[11px] text-slate-500">Real-time inspection of customer messages</p>
           </div>
         </div>
-        <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+        <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 transition">
           <X className="w-5 h-5" />
         </button>
       </div>

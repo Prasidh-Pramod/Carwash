@@ -66,10 +66,10 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
     return settledRevenue / paid.length;
   }, [filteredInvoices, settledRevenue]);
 
-  // Turnaround Time Calculation (Queue to Completed/Delivered)
+  // Turnaround Time Calculation
   const avgTurnaroundMins = useMemo(() => {
     const completed = filteredWashes.filter(w => w.completed_time && w.queue_time);
-    if (completed.length === 0) return 22; // default industry benchmark
+    if (completed.length === 0) return 22;
     const totalMinutes = completed.reduce((acc, w) => {
       const q = new Date(w.queue_time).getTime();
       const c = new Date(w.completed_time).getTime();
@@ -106,7 +106,7 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
     return Object.entries(bays).map(([bay, count]) => ({ bay, count }));
   }, [filteredWashes]);
 
-  // Hourly Traffic Heatmap (Bucketed: Morning, Mid-day, Afternoon, Evening)
+  // Hourly Traffic Heatmap
   const rushHours = useMemo(() => {
     const buckets = [
       { label: '08:00 - 11:00 (Morning Rush)', count: 0 },
@@ -153,31 +153,31 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 text-slate-900">
       
       {/* Top Header & Range Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111827] border border-slate-800 p-5 rounded-2xl shadow-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white tracking-tight">Executive Performance & Revenue</h1>
-            <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Executive Performance & Revenue</h1>
+            <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
               Live BI Engine
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Real-time throughput metrics, financial reconciliation, and bay capacity analytics.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {/* Time Scope Toggle */}
-          <div className="inline-flex rounded-xl bg-slate-900 p-0.5 border border-slate-800 text-xs font-semibold">
+          <div className="inline-flex rounded-xl bg-slate-100 p-0.5 border border-slate-200 text-xs font-semibold">
             {['ALL', 'WEEK', 'TODAY'].map(t => (
               <button
                 key={t}
                 onClick={() => setTimeRange(t)}
                 className={`px-3 py-1.5 rounded-lg transition ${
-                  timeRange === t ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                  timeRange === t ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {t === 'ALL' ? 'All Time' : t === 'WEEK' ? 'Last 7 Days' : 'Today'}
@@ -188,10 +188,10 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
           {/* Export CSV Button */}
           <button
             onClick={handleExportCSV}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition flex items-center gap-1.5"
             title="Download End-Of-Day Reconciliation Spreadsheet"
           >
-            <Download className="w-3.5 h-3.5 text-blue-400" />
+            <Download className="w-3.5 h-3.5 text-blue-600" />
             <span className="hidden sm:inline">Export CSV</span>
           </button>
         </div>
@@ -201,67 +201,67 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total Settled Revenue */}
-        <div className="bg-[#111827] border border-slate-800 p-5 rounded-2xl shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Settled Revenue</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-white mt-2">
+          <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
             {dealer.currency}{settledRevenue.toFixed(2)}
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-emerald-400 mt-2 font-medium">
+          <div className="flex items-center gap-1 text-[11px] text-emerald-700 mt-2 font-medium">
             <ArrowUpRight className="w-3 h-3" />
-            <span>{filteredInvoices.filter(i => i.status === 'PAID').length} Paid Invoices</span>
+            <span>{filteredInvoices.filter(i => i.status === 'PAID').length} Settled Transactions</span>
           </div>
         </div>
 
         {/* Average Turnaround Speed */}
-        <div className="bg-[#111827] border border-slate-800 p-5 rounded-2xl shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Avg Turnaround Speed</span>
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-white mt-2">
-            {avgTurnaroundMins} <span className="text-sm font-normal text-slate-400">mins/car</span>
+          <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
+            {avgTurnaroundMins} <span className="text-sm font-normal text-slate-500">mins/car</span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-blue-400 mt-2 font-medium">
+          <div className="flex items-center gap-1 text-[11px] text-blue-700 mt-2 font-medium">
             <CheckCircle2 className="w-3 h-3" />
             <span>Optimal Bay Throughput</span>
           </div>
         </div>
 
         {/* Average Ticket Value */}
-        <div className="bg-[#111827] border border-slate-800 p-5 rounded-2xl shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Average Ticket Value</span>
-            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-white mt-2">
+          <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
             {dealer.currency}{avgTicketPrice.toFixed(2)}
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-2 font-medium">
+          <div className="flex items-center gap-1 text-[11px] text-slate-500 mt-2 font-medium">
             <span>Per Serviced Vehicle</span>
           </div>
         </div>
 
-        {/* Fleet & Customer Retention */}
-        <div className="bg-[#111827] border border-slate-800 p-5 rounded-2xl shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        {/* Customer Base */}
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 text-xs font-medium">
             <span>Registered Customers</span>
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-white mt-2">
-            {customers.length} <span className="text-sm font-normal text-slate-400">profiles</span>
+          <div className="text-2xl font-bold font-mono text-slate-900 mt-2">
+            {customers.length} <span className="text-sm font-normal text-slate-500">profiles</span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-purple-400 mt-2 font-medium">
+          <div className="flex items-center gap-1 text-[11px] text-purple-700 mt-2 font-medium">
             <ShieldCheck className="w-3 h-3" />
             <span>{customers.filter(c => c.is_subscribed).length} Subscribed Members</span>
           </div>
@@ -270,31 +270,31 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
       </div>
 
       {/* Two Column Section: Services & Peak Hours */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         
         {/* Package Popularity Breakdown */}
-        <div className="bg-[#111827] border border-slate-800 p-5 rounded-2xl shadow-lg space-y-4">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <Layers className="w-4 h-4 text-blue-400" />
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-blue-600" />
               <span>Service Tier Distribution</span>
             </h2>
-            <span className="text-xs text-slate-400">{filteredWashes.length} total washes</span>
+            <span className="text-xs text-slate-500 font-medium">{filteredWashes.length} total washes</span>
           </div>
 
           <div className="space-y-3 pt-1">
             {serviceStats.length === 0 ? (
-              <div className="text-center py-8 text-slate-500 text-xs">No wash data in this time range</div>
+              <div className="text-center py-8 text-slate-400 text-xs">No wash data in this time range</div>
             ) : (
               serviceStats.map(s => (
                 <div key={s.name} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-slate-200">{s.name}</span>
-                    <span className="font-mono text-slate-400">{s.count} washes ({s.percent}%)</span>
+                    <span className="font-semibold text-slate-800">{s.name}</span>
+                    <span className="font-mono text-slate-600">{s.count} washes ({s.percent}%)</span>
                   </div>
-                  <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
                     <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${Math.max(5, s.percent)}%` }}
                     />
                   </div>
@@ -305,13 +305,13 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
         </div>
 
         {/* Rush Hours & Peak Traffic */}
-        <div className="bg-[#111827] border border-slate-800 p-5 rounded-2xl shadow-lg space-y-4">
+        <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-cyan-400" />
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-cyan-600" />
               <span>Peak Intake Rush Windows</span>
             </h2>
-            <span className="text-xs text-slate-400">Facility Traffic</span>
+            <span className="text-xs text-slate-500 font-medium">Facility Traffic</span>
           </div>
 
           <div className="space-y-3 pt-1">
@@ -321,12 +321,12 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
               return (
                 <div key={r.label} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-slate-200">{r.label}</span>
-                    <span className="font-mono text-cyan-400 font-semibold">{r.count} cars</span>
+                    <span className="font-semibold text-slate-800">{r.label}</span>
+                    <span className="font-mono text-cyan-700 font-bold">{r.count} cars</span>
                   </div>
-                  <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
                     <div 
-                      className="bg-cyan-500 h-2 rounded-full transition-all duration-500"
+                      className="bg-cyan-600 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${Math.max(4, pct)}%` }}
                     />
                   </div>
@@ -339,23 +339,23 @@ export default function AnalyticsView({ washes = [], invoices = [], customers = 
       </div>
 
       {/* Bay Utilization Section */}
-      <div className="bg-[#111827] border border-slate-800 p-5 rounded-2xl shadow-lg space-y-4">
+      <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-xs space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <Car className="w-4 h-4 text-emerald-400" />
+          <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <Car className="w-4 h-4 text-emerald-600" />
             <span>Wash Bay Productivity & Allocation</span>
           </h2>
-          <span className="text-xs text-slate-400">Live Bay Load</span>
+          <span className="text-xs text-slate-500 font-medium">Live Bay Load</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
           {bayStats.map(b => (
-            <div key={b.bay} className="p-4 rounded-xl bg-slate-900/90 border border-slate-800/90 flex items-center justify-between">
+            <div key={b.bay} className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-slate-400">{b.bay}</div>
-                <div className="text-xl font-bold font-mono text-white mt-1">{b.count} vehicles</div>
+                <div className="text-xs font-semibold text-slate-600">{b.bay}</div>
+                <div className="text-xl font-bold font-mono text-slate-900 mt-1">{b.count} vehicles</div>
               </div>
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold font-mono text-xs">
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold font-mono text-xs">
                 #{b.bay.replace('Bay ', '')}
               </div>
             </div>

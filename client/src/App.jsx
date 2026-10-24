@@ -303,7 +303,7 @@ export default function App() {
   // Loading Screen
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 text-sm">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center text-slate-600 text-sm font-medium">
         Initializing WashFlow Owner Portal...
       </div>
     );
@@ -316,7 +316,7 @@ export default function App() {
 
   // Logged In -> Private Car Wash Operations Dashboard
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-sans">
       
       {/* Top Navbar & PWA Controls */}
       <Navbar
@@ -335,7 +335,7 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 pb-24 md:pb-8">
         
         {dataLoading && washes.length === 0 ? (
-          <div className="py-24 text-center text-slate-400 text-sm">
+          <div className="py-24 text-center text-slate-500 text-sm">
             Syncing live bays for {currentCarwash?.name}...
           </div>
         ) : (
@@ -344,6 +344,7 @@ export default function App() {
             {activeTab === 'washes' && (
               <KanbanBoard
                 washes={washes}
+                services={services}
                 onStatusChange={handleStatusChange}
                 onOpenInvoice={handleOpenInvoiceByWashId}
                 onSendWhatsApp={handleSendWhatsAppQuick}

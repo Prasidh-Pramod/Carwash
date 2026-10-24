@@ -383,20 +383,73 @@ router.patch('/:id/inspection', (req, res) => {
   }
 });
 
-// Update bay number and technician staff
+// Update bay number, technician staff, service package, and extra add-ons (Recalculates totals & invoice)
 router.patch('/:id/details', (req, res) => {
   try {
     const washId = req.params.id;
-    const { bay_number, washer_staff } = req.body;
+    const { bay_number, washer_staff, service_id, addons, notes } = req.body;
     const wash = db.prepare('SELECT * FROM washes WHERE id = ?').get(washId);
     if (!wash) return res.status(404).json({ error: 'Wash not found' });
 
+    let updatedServiceName = wash.service_name;
+    let updatedServiceId = wash.service_id;
+    let updatedAddonsJson = wash.addons_json;
+
+    // If service changed or addons were modified
+    if (service_id || addons !== undefined) {
+      const activeServiceId = service_id || wash.service_id;
+      const srv = db.prepare('SELECT * FROM services WHERE id = ?').get(activeServiceId);
+      const basePrice = srv ? (Number(srv.base_price) || 0) : 0;
+      
+      if (srv) {
+        updatedServiceId = srv.id;
+        updatedServiceName = srv.name;
+      }
+
+      const activeAddons = Array.isArray(addons) ? addons : JSON.parse(wash.addons_json || '[]');
+      updatedAddonsJson = JSON.stringify(activeAddons);
+      const addonsTotal = activeAddons.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+      const subtotal = basePrice + addonsTotal;
+
+      const isFree = Boolean(wash.is_free_wash);
+      const discount = isFree ? basePrice : 0;
+      const taxableAmount = Math.max(0, subtotal - discount);
+      const tax = Number((taxableAmount * 0.08).toFixed(2));
+      const total = Number((taxableAmount + tax).toFixed(2));
+
+      // Update linked invoice
+      db.prepare(`
+        UPDATE invoices 
+        SET subtotal = ?, discount = ?, tax = ?, total = ?
+        WHERE wash_id = ?
+      `).run(subtotal, discount, tax, total, washId);
+
+      // Broadcast invoice updated
+      const updatedInvoice = db.prepare('SELECT * FROM invoices WHERE wash_id = ?').get(washId);
+      if (updatedInvoice) {
+        broadcastToCarwash(wash.dealer_id, 'invoice:updated', { invoice: updatedInvoice });
+      }
+    }
+
+    // Update wash table
     db.prepare(`
       UPDATE washes 
       SET bay_number = COALESCE(?, bay_number),
-          washer_staff = COALESCE(?, washer_staff)
+          washer_staff = COALESCE(?, washer_staff),
+          service_id = ?,
+          service_name = ?,
+          addons_json = ?,
+          notes = COALESCE(?, notes)
       WHERE id = ?
-    `).run(bay_number ? Number(bay_number) : null, washer_staff || null, washId);
+    `).run(
+      bay_number ? Number(bay_number) : null,
+      washer_staff || null,
+      updatedServiceId,
+      updatedServiceName,
+      updatedAddonsJson,
+      notes || null,
+      washId
+    );
 
     const updated = db.prepare(`
       SELECT w.*, c.name as customer_name, c.phone as customer_phone,
@@ -409,9 +462,16 @@ router.patch('/:id/details', (req, res) => {
       WHERE w.id = ?
     `).get(washId);
 
-    broadcastToCarwash(wash.dealer_id, 'wash:updated', { wash: updated });
-    broadcastToTracker(washId, 'tracker:status_changed', { wash: updated });
-    res.json({ message: 'Wash details updated successfully', wash: updated });
+    const parsedWash = {
+      ...updated,
+      addons: JSON.parse(updated.addons_json || '[]')
+    };
+
+    const invoice = db.prepare('SELECT * FROM invoices WHERE wash_id = ?').get(washId);
+
+    broadcastToCarwash(wash.dealer_id, 'wash:updated', { wash: parsedWash });
+    broadcastToTracker(washId, 'tracker:status_changed', { wash: parsedWash });
+    res.json({ message: 'Wash details & services updated successfully', wash: parsedWash, invoice });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

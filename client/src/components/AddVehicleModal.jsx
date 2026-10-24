@@ -52,85 +52,85 @@ export default function AddVehicleModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-md max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white border border-slate-200 w-full max-w-md max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-800/60 shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 bg-slate-50 shrink-0">
           <div className="flex items-center gap-2">
-            <Car className="w-4 h-4 text-brand-400" />
-            <h2 className="text-sm font-bold text-white">Add Vehicle to {customer.name}</h2>
+            <Car className="w-4 h-4 text-blue-600" />
+            <h2 className="text-sm font-bold text-slate-900">Add Vehicle to {customer.name}</h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {error && (
-          <div className="m-4 p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="m-4 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-5 space-y-4">
-            <div className="p-3 bg-brand-500/10 border border-brand-500/20 rounded-xl text-xs text-brand-300">
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-800">
               Adding a 2nd vehicle will qualify subscribed members for the <strong>every 4th wash FREE</strong> dealership loyalty perk!
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">License Plate *</label>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">License Plate *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. 7XYZ999"
                 value={plate}
                 onChange={(e) => setPlate(e.target.value.toUpperCase())}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono font-bold uppercase focus:outline-none focus:border-brand-500"
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono font-bold uppercase focus:outline-none focus:border-blue-600 shadow-xs"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Make *</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Make *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Toyota"
                   value={make}
                   onChange={(e) => setMake(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Model</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Model</label>
                 <input
                   type="text"
                   placeholder="e.g. RAV4"
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Color</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Color</label>
                 <input
                   type="text"
                   placeholder="e.g. Silver"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Vehicle Type</label>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Vehicle Type</label>
                 <select
                   value={vehicleType}
                   onChange={(e) => setVehicleType(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                 >
                   <option value="Sedan">Sedan</option>
                   <option value="SUV">SUV / Crossover</option>
@@ -144,18 +144,18 @@ export default function AddVehicleModal({
           </div>
 
           {/* Sticky Pinned Footer */}
-          <div className="px-5 py-3 border-t border-slate-800 bg-slate-900/95 shrink-0 flex items-center justify-end gap-2.5">
+          <div className="px-5 py-3 border-t border-slate-200 bg-slate-50 shrink-0 flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white transition active:scale-95 disabled:opacity-50"
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition active:scale-95 disabled:opacity-50"
             >
               {loading ? 'Adding...' : 'Save Vehicle'}
             </button>

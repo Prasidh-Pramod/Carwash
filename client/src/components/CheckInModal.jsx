@@ -212,23 +212,23 @@ export default function CheckInModal({
   const addonServices = services.filter(s => s.category === 'Addon');
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-2xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white border border-slate-200 w-full max-w-2xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header (Always Visible at Top) */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-b border-slate-800 bg-slate-800/60 shrink-0">
+        <div className="flex items-center justify-between px-6 py-3.5 border-b border-slate-200 bg-slate-50/80 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
               <Car className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Intake & Wash Check-In</h2>
-              <p className="text-xs text-slate-400">{dealer.name}</p>
+              <h2 className="text-base font-bold text-slate-900">Intake & Wash Check-In</h2>
+              <p className="text-xs text-slate-500">{dealer.name}</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -240,8 +240,8 @@ export default function CheckInModal({
           {/* Scrollable Form Body */}
           <div className="flex-1 overflow-y-auto p-6 space-y-5">
             {error && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>{error}</span>
               </div>
             )}
@@ -249,7 +249,7 @@ export default function CheckInModal({
           {/* Customer Selection or Inline Add */}
           <div className="space-y-3">
             {/* Segmented Switcher */}
-            <div className="bg-slate-800/90 p-1 rounded-xl flex items-center border border-slate-700/80 gap-1">
+            <div className="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200 gap-1">
               <button
                 type="button"
                 onClick={() => {
@@ -259,11 +259,11 @@ export default function CheckInModal({
                 disabled={customers.length === 0}
                 className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition ${
                   !isCreatingNewCustomer
-                    ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed'
                 }`}
               >
-                <User className="w-3.5 h-3.5" />
+                <User className="w-3.5 h-3.5 text-blue-600" />
                 <span>Existing Customer ({customers.length})</span>
               </button>
               <button
@@ -274,11 +274,11 @@ export default function CheckInModal({
                 }}
                 className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition ${
                   isCreatingNewCustomer
-                    ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3.5 h-3.5 text-blue-600" />
                 <span>+ Add New Customer</span>
               </button>
             </div>
@@ -287,11 +287,11 @@ export default function CheckInModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Select Customer */}
                 <div>
-                  <label className="text-[11px] text-slate-400 block mb-1">Select Customer</label>
+                  <label className="text-[11px] font-semibold text-slate-700 block mb-1">Select Customer</label>
                   <select
                     value={selectedCustomerId}
                     onChange={(e) => setSelectedCustomerId(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                   >
                     {customers.map(c => (
                       <option key={c.id} value={c.id}>
@@ -304,12 +304,12 @@ export default function CheckInModal({
                 {/* Select Vehicle */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] text-slate-400">Select Vehicle</label>
+                    <label className="text-[11px] font-semibold text-slate-700">Select Vehicle</label>
                     {selectedCustomer && (
                       <button
                         type="button"
                         onClick={() => onOpenAddVehicle(selectedCustomer)}
-                        className="text-[11px] text-brand-400 hover:underline flex items-center gap-0.5"
+                        className="text-[11px] text-blue-600 hover:underline flex items-center gap-0.5 font-medium"
                       >
                         + Add 2nd Vehicle
                       </button>
@@ -318,7 +318,7 @@ export default function CheckInModal({
                   <select
                     value={selectedVehicleId}
                     onChange={(e) => setSelectedVehicleId(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600 font-mono"
                   >
                     {selectedCustomer?.vehicles?.map(v => (
                       <option key={v.id} value={v.id}>
@@ -330,73 +330,73 @@ export default function CheckInModal({
               </div>
             ) : (
               /* Inline New Customer Form */
-              <div className="p-3.5 bg-slate-800/80 rounded-xl border border-brand-500/30 space-y-3">
-                <div className="text-[11px] font-bold text-brand-300 flex items-center gap-1.5 pb-1 border-b border-slate-700/60">
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                <div className="text-[11px] font-bold text-blue-700 flex items-center gap-1.5 pb-1 border-b border-slate-200">
                   <Plus className="w-3.5 h-3.5" />
                   <span>Enter New Customer & Vehicle Details:</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">Customer Name *</label>
+                    <label className="text-[10px] text-slate-600 block mb-0.5 font-semibold">Customer Name *</label>
                     <input
                       type="text"
                       placeholder="e.g. Alex Johnson"
                       value={newCustName}
                       onChange={(e) => setNewCustName(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">WhatsApp Phone *</label>
+                    <label className="text-[10px] text-slate-600 block mb-0.5 font-semibold">WhatsApp Phone *</label>
                     <input
                       type="text"
                       placeholder="e.g. +1 555-234-5678"
                       value={newCustPhone}
                       onChange={(e) => setNewCustPhone(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">License Plate *</label>
+                    <label className="text-[10px] text-slate-600 block mb-0.5 font-semibold">License Plate *</label>
                     <input
                       type="text"
                       placeholder="e.g. 7XYZ99"
                       value={newCustPlate}
                       onChange={(e) => setNewCustPlate(e.target.value.toUpperCase())}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono uppercase focus:outline-none focus:border-brand-500"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-mono uppercase focus:outline-none focus:border-blue-600 shadow-xs"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">Car Make</label>
+                    <label className="text-[10px] text-slate-600 block mb-0.5 font-semibold">Car Make</label>
                     <input
                       type="text"
                       placeholder="e.g. Honda"
                       value={newCustMake}
                       onChange={(e) => setNewCustMake(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-0.5 font-medium">Car Model</label>
+                    <label className="text-[10px] text-slate-600 block mb-0.5 font-semibold">Car Model</label>
                     <input
                       type="text"
                       placeholder="e.g. Civic"
                       value={newCustModel}
                       onChange={(e) => setNewCustModel(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                     />
                   </div>
                 </div>
-                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300 pt-1">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-700 pt-1">
                   <input
                     type="checkbox"
                     checked={newCustSubscribed}
                     onChange={(e) => setNewCustSubscribed(e.target.checked)}
-                    className="rounded border-slate-700 text-brand-500 focus:ring-0"
+                    className="rounded border-slate-300 text-blue-600 focus:ring-0"
                   />
-                  <span>Enroll in Loyalty Membership Subscription (Unlocks Free Wash Perks)</span>
+                  <span className="font-medium">Enroll in Loyalty Membership Subscription (Unlocks Free Wash Perks)</span>
                 </label>
               </div>
             )}
@@ -406,30 +406,30 @@ export default function CheckInModal({
           {!isCreatingNewCustomer && customerLoyalty && (
             <div className={`p-3.5 rounded-xl border transition ${
               isEligibleForFreeWash 
-                ? 'bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border-amber-500/50 text-amber-200'
-                : 'bg-slate-800/60 border-slate-700/80 text-slate-300'
+                ? 'bg-amber-50 border-amber-200 text-amber-900'
+                : 'bg-slate-50 border-slate-200 text-slate-700'
             }`}>
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-2">
-                  <Flame className={`w-4 h-4 shrink-0 mt-0.5 ${isEligibleForFreeWash ? 'text-amber-400 animate-bounce' : 'text-slate-400'}`} />
+                  <Flame className={`w-4 h-4 shrink-0 mt-0.5 ${isEligibleForFreeWash ? 'text-amber-600 animate-bounce' : 'text-slate-400'}`} />
                   <div>
                     <div className="text-xs font-bold flex items-center gap-2">
                       <span>{customerLoyalty.perkSummary}</span>
                       {isEligibleForFreeWash && (
-                        <span className="bg-amber-400 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="bg-amber-100 text-amber-900 border border-amber-300 font-extrabold text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">
                           100% Free Wash
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] mt-0.5 opacity-90">
+                    <p className="text-[11px] mt-0.5 text-slate-600">
                       {customerLoyalty.reason}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <div className="text-[10px] text-slate-400">Total Washes</div>
-                  <div className="text-xs font-mono font-bold text-slate-100">
+                  <div className="text-[10px] text-slate-500 font-medium">Total Washes</div>
+                  <div className="text-xs font-mono font-bold text-slate-900">
                     {customerLoyalty.currentWashCount} completed
                   </div>
                 </div>
@@ -437,12 +437,12 @@ export default function CheckInModal({
 
               {/* Action advice if close or missing */}
               {customerLoyalty.missingRequirement === 'vehicles' && (
-                <div className="mt-2 pt-2 border-t border-slate-700/50 flex items-center justify-between text-[11px] text-amber-300">
+                <div className="mt-2 pt-2 border-t border-amber-200 flex items-center justify-between text-[11px] text-amber-800">
                   <span>💡 Tip: Add customer's second vehicle now to activate 4th wash free eligibility!</span>
                   <button
                     type="button"
                     onClick={() => onOpenAddVehicle(selectedCustomer)}
-                    className="font-bold underline ml-2"
+                    className="font-bold underline ml-2 text-blue-600"
                   >
                     Add Vehicle
                   </button>
@@ -453,7 +453,7 @@ export default function CheckInModal({
 
           {/* Service Package Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300">Select Wash Package</label>
+            <label className="text-xs font-semibold text-slate-800">Select Wash Package</label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               {packageServices.map(srv => {
                 const isSelected = selectedServiceId === srv.id;
@@ -463,18 +463,18 @@ export default function CheckInModal({
                     onClick={() => setSelectedServiceId(srv.id)}
                     className={`p-3 rounded-xl border cursor-pointer transition ${
                       isSelected
-                        ? 'bg-brand-600/20 border-brand-500 text-white shadow-md shadow-brand-500/10'
-                        : 'bg-slate-800/70 border-slate-700 hover:border-slate-600 text-slate-300'
+                        ? 'bg-blue-50/80 border-2 border-blue-600 text-slate-900 shadow-xs'
+                        : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-bold">{srv.name}</span>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-brand-400" />}
+                      {isSelected && <Check className="w-3.5 h-3.5 text-blue-600" />}
                     </div>
-                    <div className="text-[11px] text-slate-400 line-clamp-2 mb-2">
+                    <div className="text-[11px] text-slate-500 line-clamp-2 mb-2">
                       {srv.description}
                     </div>
-                    <div className="text-xs font-mono font-extrabold text-brand-300">
+                    <div className="text-xs font-mono font-extrabold text-blue-600">
                       {dealer.currency}{Number(srv.base_price).toFixed(2)}
                     </div>
                   </div>
@@ -485,7 +485,7 @@ export default function CheckInModal({
 
           {/* Add-on Services */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-300">Optional Add-On Treatments</label>
+            <label className="text-xs font-semibold text-slate-800">Optional Add-On Treatments</label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {addonServices.map(addon => {
                 const isChecked = selectedAddons.some(a => a.id === addon.id);
@@ -495,19 +495,19 @@ export default function CheckInModal({
                     onClick={() => toggleAddon(addon)}
                     className={`flex items-center justify-between p-2.5 rounded-xl border text-xs cursor-pointer transition select-none ${
                       isChecked 
-                        ? 'bg-slate-800 border-brand-500/60 text-brand-300' 
-                        : 'bg-slate-800/40 border-slate-700 text-slate-400 hover:bg-slate-800/70'
+                        ? 'bg-blue-50 border-blue-300 text-blue-900 font-medium' 
+                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <div>
-                      <div className="font-medium text-slate-200">{addon.name}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">+{dealer.currency}{Number(addon.base_price).toFixed(2)}</div>
+                      <div className="font-semibold text-slate-800">{addon.name}</div>
+                      <div className="text-[10px] text-blue-600 font-mono font-medium">+{dealer.currency}{Number(addon.base_price).toFixed(2)}</div>
                     </div>
                     <input
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => {}}
-                      className="rounded border-slate-700 text-brand-500 focus:ring-0"
+                      className="rounded border-slate-300 text-blue-600 focus:ring-0"
                     />
                   </label>
                 );
@@ -518,11 +518,11 @@ export default function CheckInModal({
           {/* Bay Assignment & Staff */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">Assign Wash Bay</label>
+              <label className="text-xs font-semibold text-slate-800 block mb-1">Assign Wash Bay</label>
               <select
                 value={bayNumber}
                 onChange={(e) => setBayNumber(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
               >
                 <option value={1}>Bay #1 - Foam Cannon & High Pressure</option>
                 <option value={2}>Bay #2 - Touchless Hydro Express</option>
@@ -531,12 +531,12 @@ export default function CheckInModal({
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">Assigned Technician</label>
+              <label className="text-xs font-semibold text-slate-800 block mb-1">Assigned Technician</label>
               <input
                 type="text"
                 value={washerStaff}
                 onChange={(e) => setWasherStaff(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
               />
             </div>
           </div>
@@ -544,11 +544,11 @@ export default function CheckInModal({
           {/* Vehicle Pre-Inspection / Scratches Photo & Notes */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <Camera className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <Camera className="w-3.5 h-3.5 text-slate-500" />
                 <span>Pre-Inspection (Scratch/Dent Documentation)</span>
               </label>
-              <span className="text-[10px] text-slate-400">Protects dealership against prior damage claims</span>
+              <span className="text-[10px] text-slate-500">Protects dealership against prior damage claims</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <input
@@ -556,73 +556,65 @@ export default function CheckInModal({
                 placeholder="Before-wash photo URL or image link..."
                 value={beforePhoto}
                 onChange={(e) => setBeforePhoto(e.target.value)}
-                className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                className="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600"
               />
               <input
                 type="text"
                 placeholder="Intake notes (e.g. Scratches on left fender, fragrance-free)"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                className="bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600"
               />
             </div>
           </div>
 
           {/* WhatsApp Automated Delivery Checkbox */}
-          <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between">
+          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-emerald-400" />
+              <MessageSquare className="w-4 h-4 text-emerald-600" />
               <div>
-                <div className="text-xs font-bold text-emerald-200">Send Instant WhatsApp Intake Confirmation</div>
-                <div className="text-[10px] text-emerald-300/80">Sends ticket #{'auto'}, bay assignment & live tracking link</div>
+                <div className="text-xs font-bold text-emerald-900">Send Instant WhatsApp Intake Confirmation</div>
+                <div className="text-[10px] text-emerald-700">Sends ticket #{'auto'}, bay assignment & live tracking link</div>
               </div>
             </div>
             <input
               type="checkbox"
               checked={sendWhatsApp}
               onChange={(e) => setSendWhatsApp(e.target.checked)}
-              className="w-4 h-4 rounded border-emerald-700 text-emerald-500 focus:ring-0"
+              className="w-4 h-4 rounded border-emerald-400 text-emerald-600 focus:ring-0"
             />
           </div>
 
           {/* Pricing Summary */}
-          <div className="bg-slate-800/80 rounded-xl p-3 border border-slate-700/80 flex items-center justify-between text-xs">
+          <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-between text-xs">
             <div className="space-y-0.5">
-              <div className="text-slate-400">Subtotal: {dealer.currency}{subtotal.toFixed(2)}</div>
+              <div className="text-slate-600">Subtotal: {dealer.currency}{subtotal.toFixed(2)}</div>
               {isEligibleForFreeWash && (
-                <div className="text-amber-400 font-bold">
+                <div className="text-amber-700 font-bold">
                   Loyalty Discount: -{dealer.currency}{discount.toFixed(2)} (100% Free!)
                 </div>
               )}
-              <div className="text-slate-400">Tax (8%): {dealer.currency}{tax.toFixed(2)}</div>
+              <div className="text-slate-600">Tax (8%): {dealer.currency}{tax.toFixed(2)}</div>
             </div>
             <div className="text-right">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">Total Due</div>
-              <div className="text-lg font-mono font-extrabold text-white">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">Total Due</div>
+              <div className="text-lg font-mono font-extrabold text-slate-900">
                 {dealer.currency}{finalTotal.toFixed(2)}
               </div>
             </div>
           </div>
 
-          {/* Bottom Error Display */}
-          {error && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
           </div> {/* End Scrollable Form Body */}
 
           {/* Sticky Footer Action Bar (Always Visible at Bottom of Modal) */}
-          <div className="px-6 py-3.5 border-t border-slate-800 bg-slate-900/95 backdrop-blur shrink-0 flex items-center justify-between gap-4">
+          <div className="px-6 py-3.5 border-t border-slate-200 bg-white/95 backdrop-blur shrink-0 flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-xs">
-              <span className="text-slate-400">Total:</span>
-              <span className="text-base font-mono font-extrabold text-white">
+              <span className="text-slate-500 font-medium">Total:</span>
+              <span className="text-base font-mono font-extrabold text-slate-900">
                 {dealer.currency}{finalTotal.toFixed(2)}
               </span>
               {isEligibleForFreeWash && (
-                <span className="bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full uppercase">
+                <span className="bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px] px-2 py-0.5 rounded-full uppercase">
                   100% Free
                 </span>
               )}
@@ -632,14 +624,14 @@ export default function CheckInModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800 transition"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-500 to-cyan-500 hover:from-brand-600 hover:to-cyan-600 text-white shadow-lg shadow-brand-500/25 transition active:scale-95 disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition active:scale-95 disabled:opacity-50"
               >
                 {loading ? 'Checking in...' : 'Confirm Intake & Generate Ticket'}
               </button>

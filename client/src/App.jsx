@@ -11,6 +11,8 @@ import CustomerLiveTracker from './components/CustomerLiveTracker';
 import DealerSettingsModal from './components/DealerSettingsModal';
 import WhatsAppPhoneSimulator from './components/WhatsAppPhoneSimulator';
 import AddVehicleModal from './components/AddVehicleModal';
+import AnalyticsView from './components/AnalyticsView';
+import PitchDeckModal from './components/PitchDeckModal';
 import { api, getStoredToken, setStoredToken } from './api';
 
 export default function App() {
@@ -38,6 +40,7 @@ export default function App() {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [isWhatsAppDrawerOpen, setIsWhatsAppDrawerOpen] = useState(false);
+  const [isPitchModalOpen, setIsPitchModalOpen] = useState(false);
 
   const socketRef = useRef(null);
 
@@ -313,9 +316,9 @@ export default function App() {
 
   // Logged In -> Private Car Wash Operations Dashboard
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col font-sans">
       
-      {/* Top Navbar (Specific to this single car wash owner) */}
+      {/* Top Navbar & PWA Controls */}
       <Navbar
         carwash={currentCarwash}
         user={currentUser}
@@ -324,11 +327,12 @@ export default function App() {
         setActiveTab={setActiveTab}
         onOpenCheckIn={() => setIsCheckInOpen(true)}
         onToggleWhatsAppDrawer={() => setIsWhatsAppDrawerOpen(!isWhatsAppDrawerOpen)}
+        onOpenPitchModal={() => setIsPitchModalOpen(true)}
         unreadWaCount={whatsappLogs.length}
       />
 
-      {/* Main Workspace Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Main Workspace Body (pb-24 on mobile ensures bottom navigation never covers content) */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 pb-24 md:pb-8">
         
         {dataLoading && washes.length === 0 ? (
           <div className="py-24 text-center text-slate-400 text-sm">
@@ -350,7 +354,17 @@ export default function App() {
               />
             )}
 
-            {/* TAB 2: Customers & Multi-Vehicle Hub */}
+            {/* TAB 2: Executive Performance & Revenue Analytics */}
+            {activeTab === 'analytics' && (
+              <AnalyticsView
+                washes={washes}
+                invoices={invoices}
+                customers={customers}
+                dealer={currentCarwash || { currency: '$' }}
+              />
+            )}
+
+            {/* TAB 3: Customers & Multi-Vehicle Fleet Hub */}
             {activeTab === 'customers' && (
               <CustomersView
                 customers={customers}
@@ -361,7 +375,7 @@ export default function App() {
               />
             )}
 
-            {/* TAB 3: Invoices & Billing */}
+            {/* TAB 4: Invoices & Billing */}
             {activeTab === 'invoices' && (
               <InvoicesView
                 invoices={invoices}
@@ -371,7 +385,7 @@ export default function App() {
               />
             )}
 
-            {/* TAB 4: Customer Live Tracking Portal */}
+            {/* TAB 5: Customer Live Tracking Portal */}
             {activeTab === 'tracker' && (
               <CustomerLiveTracker
                 washes={washes}
@@ -380,7 +394,7 @@ export default function App() {
               />
             )}
 
-            {/* TAB 5: Owner Settings & Loyalty Promo Rules */}
+            {/* TAB 6: Owner Settings & Loyalty Promo Rules */}
             {activeTab === 'settings' && (
               <DealerSettingsModal
                 dealer={currentCarwash}
@@ -427,6 +441,12 @@ export default function App() {
         logs={whatsappLogs}
         dealer={currentCarwash}
         onSendCustomWhatsApp={handleSendCustomWhatsApp}
+      />
+
+      {/* MODAL 4: Commercial Pitch Deck & Value Overview */}
+      <PitchDeckModal
+        isOpen={isPitchModalOpen}
+        onClose={() => setIsPitchModalOpen(false)}
       />
 
     </div>

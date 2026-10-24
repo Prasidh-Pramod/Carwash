@@ -4,38 +4,35 @@
 
 @layer base {
   body {
-    @apply bg-slate-900 text-slate-100 min-h-screen selection:bg-brand-500 selection:text-white;
+    @apply bg-[#0B0F19] text-slate-100 min-h-screen selection:bg-blue-600 selection:text-white;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* Custom scrollbar */
+/* Subtle, refined enterprise scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(11, 15, 25, 0.7);
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.2);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(148, 163, 184, 0.35);
 }
 
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(14, 165, 233, 0.6);
-  }
+/* Hide scrollbar for clean touch carousels */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
-
-.glow-active {
-  animation: pulseGlow 2.5s infinite ease-in-out;
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @media print {
@@ -47,7 +44,7 @@
   footer,
   #root > *:not(.fixed),
   .print-hidden,
-  .print\\:hidden {
+  .print\:hidden {
     display: none !important;
   }
 

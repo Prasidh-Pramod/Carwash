@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="bubble" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <!-- Car Silhouette -->
+  <path d="M120 330 C120 310, 140 300, 160 300 L195 230 C205 210, 225 200, 250 200 L320 200 C345 200, 365 210, 375 230 L410 300 C430 300, 450 310, 450 330 L450 360 C450 375, 435 385, 420 385 L410 385 C410 405, 390 420, 370 420 C350 420, 330 405, 330 385 L230 385 C230 405, 210 420, 190 420 C170 420, 150 405, 150 385 L140 385 C125 385, 120 375, 120 360 Z" fill="#ffffff" opacity="0.95"/>
+  <!-- Wheels -->
+  <circle cx="190" cy="385" r="28" fill="#0f172a"/>
+  <circle cx="190" cy="385" r="14" fill="#38bdf8"/>
+  <circle cx="370" cy="385" r="28" fill="#0f172a"/>
+  <circle cx="370" cy="385" r="14" fill="#38bdf8"/>
+  <!-- Windows -->
+  <path d="M205 235 L250 235 L250 290 L175 290 Z" fill="#0284c7" opacity="0.35"/>
+  <path d="M265 235 L320 235 L355 290 L265 290 Z" fill="#0284c7" opacity="0.35"/>
+  <!-- Foam / Water Droplets -->
+  <circle cx="160" cy="160" r="32" fill="url(#bubble)" opacity="0.9"/>
+  <circle cx="150" cy="150" r="8" fill="#ffffff" opacity="0.8"/>
+  <circle cx="250" cy="130" r="44" fill="url(#bubble)" opacity="0.95"/>
+  <circle cx="238" cy="118" r="12" fill="#ffffff" opacity="0.85"/>
+  <circle cx="350" cy="150" r="36" fill="url(#bubble)" opacity="0.85"/>
+  <circle cx="340" cy="140" r="10" fill="#ffffff" opacity="0.8"/>
+  <circle cx="410" cy="200" r="24" fill="url(#bubble)" opacity="0.75"/>
+</svg>

@@ -1,0 +1,40 @@
+{
+  "name": "WashFlow Pro - Car Wash Operations & POS",
+  "short_name": "WashFlow",
+  "description": "Professional Car Wash Operations, Live Bay Tracking & WhatsApp Dispatch System",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B0F19",
+  "theme_color": "#0B0F19",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Check-In Vehicle",
+      "short_name": "Check-In",
+      "url": "/",
+      "description": "Intake a new vehicle into the wash queue"
+    },
+    {
+      "name": "Live Wash Bays",
+      "short_name": "Bays",
+      "url": "/",
+      "description": "View live wash queue & bay status"
+    },
+    {
+      "name": "Billing & Invoices",
+      "short_name": "Invoices",
+      "url": "/",
+      "description": "Receipts & payment settlement"
+    }
+  ]
+}

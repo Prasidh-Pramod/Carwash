@@ -1,34 +1,42 @@
 import React, { useState } from 'react';
 import { 
-  Sparkles, 
+  ShieldCheck, 
   Lock, 
   Mail, 
   Building2, 
   User, 
   Phone, 
   MapPin, 
-  Flame, 
   ArrowRight, 
-  ShieldCheck, 
   CheckCircle2, 
-  AlertCircle 
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Car,
+  Sparkles,
+  Zap
 } from 'lucide-react';
 
 export default function AuthScreen({ onLoginSuccess }) {
   const [tab, setTab] = useState('login'); // 'login' | 'register'
   
-  // Login Form
-  const [loginEmail, setLoginEmail] = useState('sparkle@carwash.com');
-  const [loginPassword, setLoginPassword] = useState('Password123!');
+  // Login Form (Starts clean/unfilled for security)
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   
   // Register Form
   const [regName, setRegName] = useState('');
   const [regCarwash, setRegCarwash] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
   const [regPhone, setRegPhone] = useState('');
   const [regCity, setRegCity] = useState('');
   const [regHasPromo, setRegHasPromo] = useState(true);
+
+  // Demo Sandbox Switcher
+  const [showDemoProfiles, setShowDemoProfiles] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -42,10 +50,10 @@ export default function AuthScreen({ onLoginSuccess }) {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword })
+        body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed');
+      if (!res.ok) throw new Error(data.error || 'Authentication failed. Please verify your credentials.');
       onLoginSuccess(data);
     } catch (err) {
       setError(err.message);
@@ -64,12 +72,12 @@ export default function AuthScreen({ onLoginSuccess }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: regName,
-          carwash_name: regCarwash,
-          email: regEmail,
+          name: regName.trim(),
+          carwash_name: regCarwash.trim(),
+          email: regEmail.trim(),
           password: regPassword,
-          phone: regPhone,
-          city: regCity,
+          phone: regPhone.trim(),
+          city: regCity.trim(),
           has_fourth_wash_promo: regHasPromo
         })
       });
@@ -83,54 +91,59 @@ export default function AuthScreen({ onLoginSuccess }) {
     }
   };
 
-  const quickLoginAs = (email, password) => {
+  const loadDemoAccount = (email, pwd) => {
     setLoginEmail(email);
-    setLoginPassword(password);
+    setLoginPassword(pwd);
+    setError('');
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#0B0F19] flex flex-col justify-center items-center p-4 sm:p-6 font-sans relative">
       
-      {/* Background Glow Orbs */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Background Subtle Gradient Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
       {/* Main Container */}
-      <div className="w-full max-w-lg z-10">
+      <div className="w-full max-w-md z-10 space-y-6">
         
         {/* Brand Header */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-cyan-400 text-white shadow-xl shadow-brand-500/20 mb-3">
-            <Sparkles className="w-7 h-7 animate-pulse" />
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20 mb-3">
+            <Car className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-white">
-            WashFlow <span className="text-brand-400">Owner Portal</span>
+          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
+            <span>WashFlow</span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-mono font-medium border border-blue-500/20">
+              PRO
+            </span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Private Car Wash Operations, Live Bay Tracking & WhatsApp Dispatch
+            Enterprise Car Wash Operations & Automated POS Platform
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-slate-900/90 backdrop-blur border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+        <div className="bg-[#111827] border border-slate-800 rounded-2xl p-6 sm:p-7 shadow-xl">
           
           {/* Navigation Tabs: Login vs Register */}
-          <div className="grid grid-cols-2 p-1 bg-slate-950 rounded-xl mb-6 border border-slate-800 text-xs font-bold">
+          <div className="grid grid-cols-2 p-1 bg-slate-900 rounded-xl mb-5 border border-slate-800/80 text-xs font-semibold">
             <button
+              type="button"
               onClick={() => { setTab('login'); setError(''); }}
               className={`py-2 rounded-lg transition ${
-                tab === 'login' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'
+                tab === 'login' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'
               }`}
             >
-              Car Wash Owner Login
+              Owner Sign In
             </button>
             <button
+              type="button"
               onClick={() => { setTab('register'); setError(''); }}
               className={`py-2 rounded-lg transition ${
-                tab === 'register' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-white'
+                tab === 'register' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-white'
               }`}
             >
-              Register New Car Wash
+              Register Facility
             </button>
           </div>
 
@@ -145,79 +158,115 @@ export default function AuthScreen({ onLoginSuccess }) {
             /* LOGIN FORM */
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Owner Email</label>
+                <label className="text-xs font-medium text-slate-300 block mb-1.5">
+                  Business Email
+                </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
                   <input
                     type="email"
                     required
+                    autoComplete="email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="owner@yourcarwash.com"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    placeholder="name@dealership.com"
+                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">Password</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-medium text-slate-300">
+                    Password
+                  </label>
+                </div>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
                   <input
-                    type="password"
+                    type={showLoginPassword ? 'text' : 'password'}
                     required
+                    autoComplete="current-password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    placeholder="••••••••••••"
+                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-9 pr-10 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200 transition"
+                    title={showLoginPassword ? 'Mask password' : 'Show password'}
+                  >
+                    {showLoginPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-500 to-cyan-500 hover:from-brand-600 hover:to-cyan-600 text-white shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50"
               >
-                <span>{loading ? 'Authenticating...' : 'Sign In to My Car Wash'}</span>
+                <span>{loading ? 'Authenticating...' : 'Sign In to Operations Console'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
-              {/* One-Click Demo Logins */}
-              <div className="pt-4 border-t border-slate-800">
-                <div className="text-[11px] font-semibold text-slate-400 mb-2">
-                  ⚡ One-Click Demo Owner Accounts:
-                </div>
-                <div className="space-y-1.5">
-                  <button
-                    type="button"
-                    onClick={() => quickLoginAs('sparkle@carwash.com', 'Password123!')}
-                    className="w-full p-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-left text-xs transition flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-bold text-white flex items-center gap-1.5">
-                        <span>SparkleWash Pro Hub</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                          4th Wash Free Active
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-slate-400">Alex Parker • sparkle@carwash.com</div>
-                    </div>
-                    <span className="text-[10px] text-brand-400 font-bold">Select</span>
-                  </button>
+              {/* Demo Sandbox Quick-Load (Collapsible for Clean Live Production) */}
+              <div className="pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowDemoProfiles(!showDemoProfiles)}
+                  className="w-full py-1 text-[11px] text-slate-400 hover:text-slate-200 flex items-center justify-between font-medium transition"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Quick-Load Demo Test Profiles</span>
+                  </span>
+                  <span className="text-[10px] text-blue-400 font-semibold">
+                    {showDemoProfiles ? 'Hide Profiles' : 'Preview'}
+                  </span>
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => quickLoginAs('apex@carwash.com', 'Password123!')}
-                    className="w-full p-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-left text-xs transition flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-bold text-white">Apex Executive Auto Spa</div>
-                      <div className="text-[10px] text-slate-400">Elena Vance • apex@carwash.com</div>
-                    </div>
-                    <span className="text-[10px] text-brand-400 font-bold">Select</span>
-                  </button>
-                </div>
+                {showDemoProfiles && (
+                  <div className="mt-2.5 space-y-1.5">
+                    <button
+                      type="button"
+                      onClick={() => loadDemoAccount('sparkle@carwash.com', 'Password123!')}
+                      className="w-full p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800/80 border border-slate-800 text-left text-xs transition flex items-center justify-between group"
+                    >
+                      <div>
+                        <div className="font-semibold text-slate-200 group-hover:text-blue-400 transition">
+                          SparkleWash Pro Hub
+                        </div>
+                        <div className="text-[10px] text-slate-400">Alex Parker • sparkle@carwash.com</div>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium border border-blue-500/20">
+                        Fill Demo
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => loadDemoAccount('apex@carwash.com', 'Password123!')}
+                      className="w-full p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800/80 border border-slate-800 text-left text-xs transition flex items-center justify-between group"
+                    >
+                      <div>
+                        <div className="font-semibold text-slate-200 group-hover:text-blue-400 transition">
+                          Apex Executive Auto Spa
+                        </div>
+                        <div className="text-[10px] text-slate-400">Elena Vance • apex@carwash.com</div>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium border border-blue-500/20">
+                        Fill Demo
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
             </form>
           ) : (
@@ -225,92 +274,101 @@ export default function AuthScreen({ onLoginSuccess }) {
             <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">Your Name</label>
+                  <label className="text-xs font-medium text-slate-300 block mb-1">Owner Name</label>
                   <input
                     type="text"
                     required
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
                     placeholder="e.g. John Doe"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">Car Wash Name</label>
+                  <label className="text-xs font-medium text-slate-300 block mb-1">Car Wash Name</label>
                   <input
                     type="text"
                     required
                     value={regCarwash}
                     onChange={(e) => setRegCarwash(e.target.value)}
-                    placeholder="e.g. Crystal Foam Wash"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    placeholder="e.g. Metro Express Wash"
+                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">Email</label>
+                  <label className="text-xs font-medium text-slate-300 block mb-1">Work Email</label>
                   <input
                     type="email"
                     required
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
-                    placeholder="owner@crystalwash.com"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    placeholder="owner@wash.com"
+                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
-                  />
+                  <label className="text-xs font-medium text-slate-300 block mb-1">Password</label>
+                  <div className="relative">
+                    <input
+                      type={showRegPassword ? 'text' : 'password'}
+                      required
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-3 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRegPassword(!showRegPassword)}
+                      className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-200 transition"
+                    >
+                      {showRegPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">WhatsApp Business Phone</label>
+                  <label className="text-xs font-medium text-slate-300 block mb-1">WhatsApp Business Phone</label>
                   <input
                     type="text"
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     placeholder="+1 (555) 123-4567"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">City / Location</label>
+                  <label className="text-xs font-medium text-slate-300 block mb-1">City / Region</label>
                   <input
                     type="text"
                     value={regCity}
                     onChange={(e) => setRegCity(e.target.value)}
                     placeholder="Dallas, TX"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
 
-              {/* Extra Feature Promo Option */}
-              <div className="p-3 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-xl">
+              {/* Loyalty Promotion Option */}
+              <div className="p-3 bg-slate-900/90 border border-slate-800 rounded-xl">
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={regHasPromo}
                     onChange={(e) => setRegHasPromo(e.target.checked)}
-                    className="mt-0.5 rounded border-amber-600 text-amber-500 focus:ring-0"
+                    className="mt-0.5 rounded border-slate-700 text-blue-600 focus:ring-0"
                   />
                   <div>
-                    <span className="text-xs font-bold text-amber-300 flex items-center gap-1">
-                      <Flame className="w-3.5 h-3.5" /> Enable 4th Wash Free for 2+ Vehicles
+                    <span className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                      <span>Enable 4th Wash Free Loyalty Engine</span>
                     </span>
-                    <p className="text-[11px] text-slate-300 mt-0.5">
-                      Subscribed customers who enroll 2 or more cars receive every 4th wash 100% free.
+                    <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                      Subscribed customers who enroll 2 or more vehicles unlock every 4th wash 100% free.
                     </p>
                   </div>
                 </label>
@@ -319,14 +377,26 @@ export default function AuthScreen({ onLoginSuccess }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-500 to-cyan-500 hover:from-brand-600 hover:to-cyan-600 text-white shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50"
               >
-                <span>{loading ? 'Creating Car Wash...' : 'Complete Registration & Open Dashboard'}</span>
+                <span>{loading ? 'Creating Account...' : 'Complete Setup & Launch Dashboard'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
           )}
 
+        </div>
+
+        {/* Security / Enterprise Trust Footer */}
+        <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400">
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>256-Bit TLS Encryption</span>
+          </div>
+          <span>•</span>
+          <div>Real-Time WebSockets</div>
+          <span>•</span>
+          <div>Multi-Bay Architecture</div>
         </div>
 
       </div>

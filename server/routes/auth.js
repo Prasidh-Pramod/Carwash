@@ -127,6 +127,7 @@ router.post('/register', (req, res) => {
     const passwordHash = bcrypt.hashSync(unmasked, 10);
 
     const dealerId = `dealer_${Date.now()}`;
+    const userId = `usr_${crypto.randomUUID()}`;
 
     // Create Carwash Dealership record
     db.prepare(`

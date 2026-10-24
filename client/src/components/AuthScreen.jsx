@@ -17,6 +17,19 @@ import {
   Zap
 } from 'lucide-react';
 
+async function hashClientPassword(plainText) {
+  if (!plainText) return '';
+  try {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plainText);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    return plainText;
+  }
+}
+
 export default function AuthScreen({ onLoginSuccess }) {
   const [tab, setTab] = useState('login'); // 'login' | 'register'
   
@@ -47,10 +60,16 @@ export default function AuthScreen({ onLoginSuccess }) {
     setError('');
 
     try {
+      // Cryptographically digest password before transmitting over HTTP/network
+      const maskedPassword = await hashClientPassword(loginPassword);
+
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword })
+        body: JSON.stringify({ 
+          email: loginEmail.trim(), 
+          password: maskedPassword 
+        })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Authentication failed. Please verify your credentials.');
@@ -68,6 +87,9 @@ export default function AuthScreen({ onLoginSuccess }) {
     setError('');
 
     try {
+      // Cryptographically digest password before transmitting over HTTP/network
+      const maskedPassword = await hashClientPassword(regPassword);
+
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -75,7 +97,7 @@ export default function AuthScreen({ onLoginSuccess }) {
           name: regName.trim(),
           carwash_name: regCarwash.trim(),
           email: regEmail.trim(),
-          password: regPassword,
+          password: maskedPassword,
           phone: regPhone.trim(),
           city: regCity.trim(),
           has_fourth_wash_promo: regHasPromo

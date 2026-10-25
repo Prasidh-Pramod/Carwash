@@ -12,7 +12,9 @@ server/.env
 .env.local
 .env.production
 
-# Database locks / temp files
+# Database locks / sqlite
+server/data/*.db
+*.db
 *.db-journal
 *.db-wal
 *.db-shm

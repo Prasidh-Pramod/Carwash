@@ -38,3 +38,16 @@ export function authMiddleware(req, res, next) {
     return res.status(401).json({ error: 'Invalid or expired token. Please log in again.' });
   }
 }
+
+export function superAdminMiddleware(req, res, next) {
+  authMiddleware(req, res, () => {
+    const isSuper = req.user && (
+      req.user.role === 'SUPERADMIN' || 
+      (req.user.email && req.user.email.toLowerCase() === 'prasidh25@gmail.com')
+    );
+    if (!isSuper) {
+      return res.status(403).json({ error: 'Access denied. Super Admin privileges required.' });
+    }
+    next();
+  });
+}

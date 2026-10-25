@@ -11,6 +11,7 @@ import customersRouter from './routes/customers.js';
 import washesRouter from './routes/washes.js';
 import invoicesRouter from './routes/invoices.js';
 import whatsappRouter from './routes/whatsapp.js';
+import adminRouter from './routes/admin.js';
 
 dotenv.config();
 
@@ -76,6 +77,7 @@ app.use('/api/customers', customersRouter);
 app.use('/api/washes', washesRouter);
 app.use('/api/invoices', invoicesRouter);
 app.use('/api/whatsapp', whatsappRouter);
+app.use('/api/admin', adminRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

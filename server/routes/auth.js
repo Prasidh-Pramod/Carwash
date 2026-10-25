@@ -72,6 +72,12 @@ router.post('/login', (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    // Auto-promote platform owner to SUPERADMIN
+    if (user.email.toLowerCase() === 'prasidh25@gmail.com' && user.role !== 'SUPERADMIN') {
+      db.prepare(`UPDATE users SET role = 'SUPERADMIN' WHERE id = ?`).run(user.id);
+      user.role = 'SUPERADMIN';
+    }
+
     const dealer = db.prepare('SELECT * FROM dealers WHERE id = ?').get(user.dealer_id);
 
     const token = signToken({
@@ -129,10 +135,17 @@ router.post('/register', (req, res) => {
     const dealerId = `dealer_${Date.now()}`;
     const userId = `usr_${crypto.randomUUID()}`;
 
+    const isSuperAdmin = cleanEmail === 'prasidh25@gmail.com';
+    const role = isSuperAdmin ? 'SUPERADMIN' : 'OWNER';
+    const subStatus = isSuperAdmin ? 'ACTIVE' : 'TRIAL';
+    const subPlan = isSuperAdmin ? 'Platform Owner / SuperAdmin' : '14-Day Free Trial';
+    const trialDays = 14;
+    const trialEndsAt = new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000).toISOString();
+
     // Create Carwash Dealership record
     db.prepare(`
-      INSERT INTO dealers (id, name, phone, email, address, city, currency, whatsapp_phone, has_fourth_wash_promo, promo_title, promo_description)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO dealers (id, name, phone, email, address, city, currency, whatsapp_phone, has_fourth_wash_promo, promo_title, promo_description, subscription_status, subscription_plan, trial_ends_at, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `).run(
       dealerId,
       carwash_name,
@@ -144,7 +157,10 @@ router.post('/register', (req, res) => {
       phone || '',
       has_fourth_wash_promo ? 1 : 0,
       '4th Wash Free Loyalty Pass',
-      'Subscribed members with 2 or more registered vehicles receive every 4th wash 100% FREE!'
+      'Subscribed members with 2 or more registered vehicles receive every 4th wash 100% FREE!',
+      subStatus,
+      subPlan,
+      trialEndsAt
     );
 
     // Create Owner User
@@ -157,7 +173,7 @@ router.post('/register', (req, res) => {
       name,
       cleanEmail,
       passwordHash,
-      'OWNER'
+      role
     );
 
     // Seed default packages for this new car wash

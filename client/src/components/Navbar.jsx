@@ -10,7 +10,8 @@ import {
   BarChart3,
   Sparkles,
   Download,
-  Zap
+  Zap,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -57,7 +58,10 @@ export default function Navbar({
     setDeferredPrompt(null);
   };
 
+  const isSuperAdmin = user?.role === 'SUPERADMIN' || user?.email?.toLowerCase() === 'prasidh25@gmail.com';
+
   const navItems = [
+    ...(isSuperAdmin ? [{ id: 'superadmin', label: 'Platform Master Console', icon: ShieldCheck, isSpecial: true }] : []),
     { id: 'washes', label: 'Wash Bays', icon: Car },
     { id: 'analytics', label: 'Analytics & Revenue', icon: BarChart3 },
     { id: 'customers', label: 'Customers & Fleets', icon: Users },
@@ -96,6 +100,22 @@ export default function Navbar({
             {/* Action Tools & User Menu */}
             <div className="flex items-center gap-2">
               
+              {/* Super Admin Master Console Button */}
+              {isSuperAdmin && (
+                <button
+                  onClick={() => setActiveTab('superadmin')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs ${
+                    activeTab === 'superadmin'
+                      ? 'bg-purple-600 text-white shadow-purple-200'
+                      : 'bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100'
+                  }`}
+                  title="Open Master Super Admin Console"
+                >
+                  <ShieldCheck className="w-4 h-4 text-purple-600 group-hover:text-purple-700" />
+                  <span>Master Console</span>
+                </button>
+              )}
+
               {/* Pitch Deck / Commercial Showcase */}
               <button
                 onClick={onOpenPitchModal}
@@ -160,17 +180,21 @@ export default function Navbar({
             {navItems.map(item => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
+              const activeClass = item.isSpecial
+                ? 'bg-purple-50 text-purple-700 font-bold border border-purple-200 shadow-xs'
+                : 'bg-blue-50 text-blue-700 font-semibold border border-blue-200 shadow-xs';
+
               return (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium transition whitespace-nowrap ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200 shadow-xs'
+                      ? activeClass
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className={`w-4 h-4 ${item.isSpecial ? 'text-purple-600' : ''}`} />
                   <span>{item.label}</span>
                 </button>
               );

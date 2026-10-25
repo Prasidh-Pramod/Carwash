@@ -78,5 +78,12 @@ export const api = {
 
   // WhatsApp Logs & Simulation
   getWhatsAppLogs: (dealerId) => request(`/whatsapp/logs?dealer_id=${dealerId}`),
-  sendWhatsAppMessage: (body) => request('/whatsapp/send', { method: 'POST', body: JSON.stringify(body) })
+  sendWhatsAppMessage: (body) => request('/whatsapp/send', { method: 'POST', body: JSON.stringify(body) }),
+
+  // Super Admin Platform Master
+  getAdminStats: () => request('/admin/stats'),
+  getAdminFacilities: () => request('/admin/facilities'),
+  updateFacilitySubscription: (id, body) => request(`/admin/facilities/${id}/subscription`, { method: 'PATCH', body: JSON.stringify(body) }),
+  impersonateFacility: (dealerId) => request(`/admin/impersonate/${dealerId}`, { method: 'POST' }),
+  deleteFacility: (id) => request(`/admin/facilities/${id}`, { method: 'DELETE' })
 };

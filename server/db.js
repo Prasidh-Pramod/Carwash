@@ -149,6 +149,28 @@ export function initDB() {
     );
   `);
 
+  // Run schema migrations for facility subscription management
+  try {
+    db.exec(`ALTER TABLE dealers ADD COLUMN subscription_status TEXT DEFAULT 'ACTIVE'`);
+  } catch (e) {}
+  try {
+    db.exec(`ALTER TABLE dealers ADD COLUMN subscription_plan TEXT DEFAULT 'Pro Unlimited ($99/mo)'`);
+  } catch (e) {}
+  try {
+    db.exec(`ALTER TABLE dealers ADD COLUMN trial_ends_at DATETIME`);
+  } catch (e) {}
+  try {
+    db.exec(`ALTER TABLE dealers ADD COLUMN subscription_ends_at DATETIME`);
+  } catch (e) {}
+  try {
+    db.exec(`ALTER TABLE dealers ADD COLUMN is_active INTEGER DEFAULT 1`);
+  } catch (e) {}
+
+  // Elevate platform owner to SUPERADMIN
+  try {
+    db.prepare(`UPDATE users SET role = 'SUPERADMIN' WHERE LOWER(email) = 'prasidh25@gmail.com'`).run();
+  } catch (e) {}
+
   seedData();
 }
 

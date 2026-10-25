@@ -13,6 +13,7 @@ import WhatsAppPhoneSimulator from './components/WhatsAppPhoneSimulator';
 import AddVehicleModal from './components/AddVehicleModal';
 import AnalyticsView from './components/AnalyticsView';
 import PitchDeckModal from './components/PitchDeckModal';
+import SuperAdminDashboard from './components/SuperAdminDashboard';
 import { api, getStoredToken, setStoredToken } from './api';
 
 export default function App() {
@@ -56,6 +57,10 @@ export default function App() {
         const res = await api.getMe();
         setCurrentUser(res.user);
         setCurrentCarwash(res.carwash);
+        const isSuper = res.user?.role === 'SUPERADMIN' || res.user?.email?.toLowerCase() === 'prasidh25@gmail.com';
+        if (isSuper) {
+          setActiveTab('superadmin');
+        }
       } catch (err) {
         console.warn('Session expired or invalid:', err.message);
         setStoredToken(null);
@@ -151,6 +156,27 @@ export default function App() {
     setAuthToken(authData.token);
     setCurrentUser(authData.user);
     setCurrentCarwash(authData.carwash);
+    const isSuper = authData.user?.role === 'SUPERADMIN' || authData.user?.email?.toLowerCase() === 'prasidh25@gmail.com';
+    if (isSuper) {
+      setActiveTab('superadmin');
+    }
+  };
+
+  const handleImpersonateFacility = async (dealerId) => {
+    try {
+      setDataLoading(true);
+      const res = await api.impersonateFacility(dealerId);
+      setStoredToken(res.token);
+      setAuthToken(res.token);
+      setCurrentCarwash(res.carwash);
+      setCurrentUser(res.user);
+      await loadCarwashData(dealerId);
+      setActiveTab('washes');
+    } catch (err) {
+      alert(`Could not switch into facility: ${err.message}`);
+    } finally {
+      setDataLoading(false);
+    }
   };
 
   // Handle Logout
@@ -315,9 +341,29 @@ export default function App() {
   }
 
   // Logged In -> Private Car Wash Operations Dashboard
+  const isSuperAdmin = currentUser?.role === 'SUPERADMIN' || currentUser?.email?.toLowerCase() === 'prasidh25@gmail.com';
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-sans">
       
+      {/* Super Admin Inspection Mode Banner */}
+      {isSuperAdmin && activeTab !== 'superadmin' && (
+        <div className="bg-purple-700 text-white text-xs px-4 py-2 flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded text-[10px]">
+              SUPER ADMIN MODE
+            </span>
+            <span>Inspecting operations for <strong>{currentCarwash?.name}</strong></span>
+          </div>
+          <button
+            onClick={() => setActiveTab('superadmin')}
+            className="px-3 py-1 bg-white text-purple-900 font-bold rounded-lg text-xs hover:bg-purple-50 transition"
+          >
+            ← Return to Master Console
+          </button>
+        </div>
+      )}
+
       {/* Top Navbar & PWA Controls */}
       <Navbar
         carwash={currentCarwash}
@@ -334,12 +380,20 @@ export default function App() {
       {/* Main Workspace Body (pb-24 on mobile ensures bottom navigation never covers content) */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 pb-24 md:pb-8">
         
-        {dataLoading && washes.length === 0 ? (
+        {dataLoading && washes.length === 0 && activeTab !== 'superadmin' ? (
           <div className="py-24 text-center text-slate-500 text-sm">
             Syncing live bays for {currentCarwash?.name}...
           </div>
         ) : (
           <>
+            {/* TAB 0: Super Admin Master Console */}
+            {activeTab === 'superadmin' && (
+              <SuperAdminDashboard
+                currentUser={currentUser}
+                onImpersonateFacility={handleImpersonateFacility}
+              />
+            )}
+
             {/* TAB 1: Live Wash Bay Kanban Board (Real-Time) */}
             {activeTab === 'washes' && (
               <KanbanBoard

@@ -67,7 +67,7 @@ export default function Navbar({
     { id: 'customers', label: 'Customers & Fleets', icon: Users },
     { id: 'invoices', label: 'Invoices & Billing', icon: Receipt },
     { id: 'tracker', label: 'Customer Live Tracker', icon: Sparkles },
-    { id: 'settings', label: 'Settings & Loyalty', icon: Settings },
+    { id: 'settings', label: 'Settings & Pricing', icon: Settings },
   ];
 
   return (

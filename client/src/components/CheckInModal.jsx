@@ -14,6 +14,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { detectCurrency } from '../utils/currency';
 
 export default function CheckInModal({
   isOpen,
@@ -80,6 +81,30 @@ export default function CheckInModal({
 
   const customerLoyalty = selectedCustomer?.loyalty;
   const isEligibleForFreeWash = Boolean(customerLoyalty?.eligible);
+
+  // Dynamic Country / International Currency Detection (USER REQUEST #2)
+  const activeCustomerPhone = isCreatingNewCustomer ? newCustPhone : selectedCustomer?.phone;
+  const currency = detectCurrency(activeCustomerPhone, dealer?.currency || '$');
+
+  // Dynamic Bays & Staff (USER REQUEST #1)
+  const availableBays = dealer?.bays && dealer.bays.length > 0
+    ? dealer.bays
+    : [
+        "Bay #1 - Foam Cannon & High Pressure",
+        "Bay #2 - Touchless Hydro Express",
+        "Bay #3 - Ceramic & Detailing Bay",
+        "Bay #4 - Interior Vacuum & Shampoo"
+      ];
+
+  const availableTechnicians = dealer?.technicians && dealer.technicians.length > 0
+    ? dealer.technicians
+    : ["Carlos R.", "David K.", "Alex P.", "Elena V."];
+
+  useEffect(() => {
+    if (availableTechnicians.length > 0 && !washerStaff) {
+      setWasherStaff(availableTechnicians[0]);
+    }
+  }, [availableTechnicians]);
 
   // Calculations
   const serviceObj = services.find(s => s.id === selectedServiceId) || { base_price: 0, name: '' };
@@ -475,7 +500,7 @@ export default function CheckInModal({
                       {srv.description}
                     </div>
                     <div className="text-xs font-mono font-extrabold text-blue-600">
-                      {dealer.currency}{Number(srv.base_price).toFixed(2)}
+                      {currency}{Number(srv.base_price).toFixed(2)}
                     </div>
                   </div>
                 );
@@ -501,7 +526,7 @@ export default function CheckInModal({
                   >
                     <div>
                       <div className="font-semibold text-slate-800">{addon.name}</div>
-                      <div className="text-[10px] text-blue-600 font-mono font-medium">+{dealer.currency}{Number(addon.base_price).toFixed(2)}</div>
+                      <div className="text-[10px] text-blue-600 font-mono font-medium">+{currency}{Number(addon.base_price).toFixed(2)}</div>
                     </div>
                     <input
                       type="checkbox"
@@ -521,23 +546,33 @@ export default function CheckInModal({
               <label className="text-xs font-semibold text-slate-800 block mb-1">Assign Wash Bay</label>
               <select
                 value={bayNumber}
-                onChange={(e) => setBayNumber(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
+                onChange={(e) => setBayNumber(Number(e.target.value))}
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600 font-medium"
               >
-                <option value={1}>Bay #1 - Foam Cannon & High Pressure</option>
-                <option value={2}>Bay #2 - Touchless Hydro Express</option>
-                <option value={3}>Bay #3 - Ceramic & Detailing Bay</option>
-                <option value={4}>Bay #4 - Interior Vacuum & Shampoo</option>
+                {availableBays.map((bayName, idx) => (
+                  <option key={idx} value={idx + 1}>
+                    {bayName}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label className="text-xs font-semibold text-slate-800 block mb-1">Assigned Technician</label>
-              <input
-                type="text"
-                value={washerStaff}
-                onChange={(e) => setWasherStaff(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  list="technicians-checkin-list"
+                  placeholder="Select or enter technician..."
+                  value={washerStaff}
+                  onChange={(e) => setWasherStaff(e.target.value)}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600 font-medium"
+                />
+                <datalist id="technicians-checkin-list">
+                  {availableTechnicians.map((t, idx) => (
+                    <option key={idx} value={t} />
+                  ))}
+                </datalist>
+              </div>
             </div>
           </div>
 
@@ -588,18 +623,18 @@ export default function CheckInModal({
           {/* Pricing Summary */}
           <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-between text-xs">
             <div className="space-y-0.5">
-              <div className="text-slate-600">Subtotal: {dealer.currency}{subtotal.toFixed(2)}</div>
+              <div className="text-slate-600">Subtotal: {currency}{subtotal.toFixed(2)}</div>
               {isEligibleForFreeWash && (
                 <div className="text-amber-700 font-bold">
-                  Loyalty Discount: -{dealer.currency}{discount.toFixed(2)} (100% Free!)
+                  Loyalty Discount: -{currency}{discount.toFixed(2)} (100% Free!)
                 </div>
               )}
-              <div className="text-slate-600">Tax (8%): {dealer.currency}{tax.toFixed(2)}</div>
+              <div className="text-slate-600">Tax (8%): {currency}{tax.toFixed(2)}</div>
             </div>
             <div className="text-right">
               <div className="text-[10px] text-slate-500 uppercase font-semibold">Total Due</div>
               <div className="text-lg font-mono font-extrabold text-slate-900">
-                {dealer.currency}{finalTotal.toFixed(2)}
+                {currency}{finalTotal.toFixed(2)}
               </div>
             </div>
           </div>
@@ -611,7 +646,7 @@ export default function CheckInModal({
             <div className="flex items-center gap-2 text-xs">
               <span className="text-slate-500 font-medium">Total:</span>
               <span className="text-base font-mono font-extrabold text-slate-900">
-                {dealer.currency}{finalTotal.toFixed(2)}
+                {currency}{finalTotal.toFixed(2)}
               </span>
               {isEligibleForFreeWash && (
                 <span className="bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px] px-2 py-0.5 rounded-full uppercase">

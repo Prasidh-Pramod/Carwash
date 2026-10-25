@@ -174,6 +174,12 @@ export function initDB() {
   try {
     db.exec(`ALTER TABLE dealers ADD COLUMN is_active INTEGER DEFAULT 1`);
   } catch (e) {}
+  try {
+    db.exec(`ALTER TABLE dealers ADD COLUMN bays_json TEXT DEFAULT '["Bay #1 - Foam Cannon & High Pressure", "Bay #2 - Touchless Hydro Express", "Bay #3 - Ceramic & Detailing Bay", "Bay #4 - Interior Vacuum & Shampoo"]'`);
+  } catch (e) {}
+  try {
+    db.exec(`ALTER TABLE dealers ADD COLUMN technicians_json TEXT DEFAULT '["Carlos R.", "David K.", "Alex P.", "Elena V."]'`);
+  } catch (e) {}
 
   // Ensure platform owner prasidh25@gmail.com exists and is SUPERADMIN
   try {

@@ -18,6 +18,7 @@ import {
   X, 
   ChevronDown 
 } from 'lucide-react';
+import { detectCurrency } from '../utils/currency';
 
 function getLocalDateString(dateStr) {
   if (!dateStr) return '';
@@ -456,6 +457,7 @@ export default function InvoicesView({
                   const isFree = Boolean(inv.is_free_wash);
                   const hasWaSent = Boolean(inv.whatsapp_sent);
                   const checkInTime = inv.check_in_time || inv.queue_time;
+                  const rowCurrency = detectCurrency(inv.customer_phone, inv.dealer_currency || dealer.currency);
 
                   return (
                     <tr key={inv.id} className="hover:bg-slate-50/80 transition">
@@ -526,11 +528,11 @@ export default function InvoicesView({
                       {/* 5. Total */}
                       <td className="py-3.5 px-4">
                         <div className="font-mono font-extrabold text-sm text-slate-900">
-                          {inv.dealer_currency || dealer.currency}{Number(inv.total || 0).toFixed(2)}
+                          {rowCurrency}{Number(inv.total || 0).toFixed(2)}
                         </div>
                         {Number(inv.discount) > 0 && (
                           <div className="text-[10px] text-amber-700 font-semibold">
-                            Saved: {inv.dealer_currency || dealer.currency}{Number(inv.discount).toFixed(2)}
+                            Saved: {rowCurrency}{Number(inv.discount).toFixed(2)}
                           </div>
                         )}
                       </td>

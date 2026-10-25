@@ -449,11 +449,13 @@ export default function App() {
               />
             )}
 
-            {/* TAB 6: Owner Settings & Loyalty Promo Rules */}
+            {/* TAB 6: Owner Settings & Operations Manager */}
             {activeTab === 'settings' && (
               <DealerSettingsModal
                 dealer={currentCarwash}
                 onUpdateDealer={handleUpdateDealer}
+                services={services}
+                onRefreshServices={() => loadCarwashData(currentCarwash.id)}
               />
             )}
           </>

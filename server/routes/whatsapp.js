@@ -3,6 +3,26 @@ import db from '../db.js';
 
 const router = express.Router();
 
+function detectCurrency(phone, fallbackCurrency = '$') {
+  if (phone) {
+    const cleanPhone = String(phone).replace(/[\s\-\(\)\.]/g, '');
+    if (
+      cleanPhone.startsWith('+91') || 
+      (cleanPhone.startsWith('91') && cleanPhone.length >= 12) ||
+      (/^\+?91/.test(cleanPhone)) ||
+      (/^[6-9]\d{9}$/.test(cleanPhone))
+    ) {
+      return '₹';
+    }
+    if (cleanPhone.startsWith('+44') || (cleanPhone.startsWith('44') && cleanPhone.length >= 11)) return '£';
+    if (/^\+?(33|49|34|39|31|32|351|353|30|43)/.test(cleanPhone)) return '€';
+    if (cleanPhone.startsWith('+971') || (cleanPhone.startsWith('971') && cleanPhone.length >= 12)) return 'AED ';
+    if (cleanPhone.startsWith('+61') || (cleanPhone.startsWith('61') && cleanPhone.length >= 11)) return 'A$';
+    if (cleanPhone.startsWith('+1') || (cleanPhone.startsWith('1') && cleanPhone.length === 11)) return '$';
+  }
+  return fallbackCurrency || '$';
+}
+
 // Core notification generator
 export async function sendWhatsAppNotification({
   dealerId,
@@ -28,6 +48,7 @@ export async function sendWhatsAppNotification({
   const hostUrl = process.env.CLIENT_URL || 'http://localhost:3000';
   const trackUrl = `${hostUrl}/track/${washId || washCode}`;
   const invoiceUrl = `${hostUrl}/invoice/${washId}`;
+  const currencySymbol = detectCurrency(customerPhone, '$');
 
   let messageBody = '';
 
@@ -39,7 +60,7 @@ export async function sendWhatsAppNotification({
         `Your *${carModel}* [${licensePlate}] has been checked in for *${serviceName}* at *${dealerName}*.\n\n` +
         `🔢 Wash Ticket: *${washCode}*\n` +
         `📍 Assigned Bay: *Bay #${bayNumber || 1}*\n` +
-        (isFreeWash ? `🎉 *SPECIAL PERK*: ${freeReason || '4th Wash FREE!'} (Total: $0.00)\n` : '') +
+        (isFreeWash ? `🎉 *SPECIAL PERK*: ${freeReason || '4th Wash FREE!'} (Total: ${currencySymbol}0.00)\n` : '') +
         `\n📲 *Track your wash progress in real-time:* \n${trackUrl}\n\n` +
         `We will notify you the moment your wash is completed!`;
       break;
@@ -97,7 +118,7 @@ export async function sendWhatsAppNotification({
         `Thank you for your visit to *${dealerName}*.\n\n` +
         `• Vehicle: *${carModel}* [${licensePlate}]\n` +
         `• Service: *${serviceName}*\n` +
-        `• Total Amount: *$${Number(totalAmount || 0).toFixed(2)}*\n` +
+        `• Total Amount: *${currencySymbol}${Number(totalAmount || 0).toFixed(2)}*\n` +
         (isFreeWash ? `• Discount: 100% Loyalty Free Wash Applied! 🎁\n` : '') +
         `\n📄 *Download or print your itemized receipt here:* \n${invoiceUrl}\n\n` +
         `Questions? Call us at ${dealerPhone || 'our service desk'}.`;

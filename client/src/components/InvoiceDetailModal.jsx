@@ -11,9 +11,10 @@ import {
   Flame,
   ExternalLink 
 } from 'lucide-react';
+import { detectCurrency } from '../utils/currency';
 
 function ReceiptBody({ invoice, isPaid, isFree, copyTitle }) {
-  const currency = invoice.dealer_currency || '$';
+  const currency = detectCurrency(invoice.customer_phone, invoice.dealer_currency || '$');
   const subtotal = Number(invoice.subtotal || 0);
   const addonsTotal = (invoice.addons || []).reduce((s, a) => s + (Number(a.price) || 0), 0);
   const basePrice = Math.max(0, subtotal - addonsTotal);

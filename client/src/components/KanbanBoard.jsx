@@ -20,6 +20,7 @@ import {
   Check,
   DollarSign
 } from 'lucide-react';
+import { detectCurrency } from '../utils/currency';
 
 const COLUMNS = [
   { id: 'QUEUED', title: '1. Queued & Intake', shortTitle: 'Queued', color: 'border-slate-200 bg-slate-100/70', icon: Clock, badgeColor: 'bg-amber-100 text-amber-800 border border-amber-300' },
@@ -55,6 +56,23 @@ export default function KanbanBoard({
   // Packages and Add-ons from services list
   const availablePackages = services.filter(s => s.category === 'Package' || !s.category);
   const availableAddons = services.filter(s => s.category === 'Addon');
+
+  // Dynamic Bays & Staff (USER REQUEST #1)
+  const availableBays = dealer?.bays && dealer.bays.length > 0 
+    ? dealer.bays 
+    : [
+        "Bay #1 - Foam Cannon & High Pressure",
+        "Bay #2 - Touchless Hydro Express",
+        "Bay #3 - Ceramic & Detailing Bay",
+        "Bay #4 - Interior Vacuum & Shampoo"
+      ];
+
+  const availableTechnicians = dealer?.technicians && dealer.technicians.length > 0
+    ? dealer.technicians
+    : ["Carlos R.", "David K.", "Alex P.", "Elena V."];
+
+  // Dynamic International Currency Detection (USER REQUEST #2)
+  const editCurrency = detectCurrency(editingWash?.customer_phone, dealer?.currency || '$');
 
   const openEditModal = (wash) => {
     setEditingWash(wash);
@@ -489,7 +507,7 @@ export default function KanbanBoard({
                         </div>
                       </div>
                       <span className="font-mono font-bold text-xs text-blue-700 ml-2">
-                        +{dealer.currency}{Number(addon.base_price).toFixed(2)}
+                        +{editCurrency}{Number(addon.base_price).toFixed(2)}
                       </span>
                     </button>
                   );
@@ -501,27 +519,27 @@ export default function KanbanBoard({
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
               <div className="flex items-center justify-between text-slate-600">
                 <span>Base Package ({selectedServiceObj.name}):</span>
-                <span className="font-mono font-semibold">{dealer.currency}{currentBasePrice.toFixed(2)}</span>
+                <span className="font-mono font-semibold">{editCurrency}{currentBasePrice.toFixed(2)}</span>
               </div>
               {currentAddonsTotal > 0 && (
                 <div className="flex items-center justify-between text-slate-600">
                   <span>Extra Add-ons ({newAddons.length}):</span>
-                  <span className="font-mono font-semibold text-blue-600">+{dealer.currency}{currentAddonsTotal.toFixed(2)}</span>
+                  <span className="font-mono font-semibold text-blue-600">+{editCurrency}{currentAddonsTotal.toFixed(2)}</span>
                 </div>
               )}
               {isFreeWash && (
                 <div className="flex items-center justify-between text-amber-700 font-semibold">
                   <span>Loyalty 4th Wash Free Discount:</span>
-                  <span className="font-mono">-{dealer.currency}{currentDiscount.toFixed(2)}</span>
+                  <span className="font-mono">-{editCurrency}{currentDiscount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex items-center justify-between text-slate-500 text-[11px]">
                 <span>Estimated Tax (8%):</span>
-                <span className="font-mono">{dealer.currency}{currentTax.toFixed(2)}</span>
+                <span className="font-mono">{editCurrency}{currentTax.toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between text-slate-900 font-bold text-sm pt-2 border-t border-slate-200">
                 <span>Recalculated Total:</span>
-                <span className="font-mono text-base text-blue-600 font-extrabold">{dealer.currency}{currentTotal.toFixed(2)}</span>
+                <span className="font-mono text-base text-blue-600 font-extrabold">{editCurrency}{currentTotal.toFixed(2)}</span>
               </div>
             </div>
 
@@ -532,24 +550,31 @@ export default function KanbanBoard({
                 <select
                   value={newBay}
                   onChange={(e) => setNewBay(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500 font-medium"
                 >
-                  <option value="1">Bay #1 - Foam Cannon & High Pressure</option>
-                  <option value="2">Bay #2 - Touchless Hydro Express</option>
-                  <option value="3">Bay #3 - Ceramic & Detailing Bay</option>
-                  <option value="4">Bay #4 - Interior Vacuum & Detailing</option>
+                  {availableBays.map((bName, idx) => (
+                    <option key={idx} value={idx + 1}>{bName}</option>
+                  ))}
                 </select>
               </div>
 
               <div>
                 <label className="text-xs font-semibold text-slate-800 block mb-1">Technician / Staff Member</label>
-                <input
-                  type="text"
-                  value={newStaff}
-                  onChange={(e) => setNewStaff(e.target.value)}
-                  placeholder="e.g. Carlos R."
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    list="kanban-technicians-list"
+                    value={newStaff}
+                    onChange={(e) => setNewStaff(e.target.value)}
+                    placeholder="e.g. Carlos R."
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-500 font-medium"
+                  />
+                  <datalist id="kanban-technicians-list">
+                    {availableTechnicians.map((t, idx) => (
+                      <option key={idx} value={t} />
+                    ))}
+                  </datalist>
+                </div>
               </div>
             </div>
 

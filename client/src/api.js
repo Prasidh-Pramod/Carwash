@@ -47,6 +47,9 @@ export const api = {
   getDealer: (id) => request(`/dealers/${id}`),
   updateDealer: (id, body) => request(`/dealers/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   getServices: (dealerId) => request(`/dealers/${dealerId}/services`),
+  createService: (dealerId, body) => request(`/dealers/${dealerId}/services`, { method: 'POST', body: JSON.stringify(body) }),
+  updateService: (dealerId, serviceId, body) => request(`/dealers/${dealerId}/services/${serviceId}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteService: (dealerId, serviceId) => request(`/dealers/${dealerId}/services/${serviceId}`, { method: 'DELETE' }),
 
   // Washes
   getWashes: (dealerId, status = '') => request(`/washes?dealer_id=${dealerId}${status ? `&status=${status}` : ''}`),

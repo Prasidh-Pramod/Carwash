@@ -175,10 +175,32 @@ export function initDB() {
     db.exec(`ALTER TABLE dealers ADD COLUMN is_active INTEGER DEFAULT 1`);
   } catch (e) {}
 
-  // Elevate platform owner to SUPERADMIN
+  // Ensure platform owner prasidh25@gmail.com exists and is SUPERADMIN
   try {
-    db.prepare(`UPDATE users SET role = 'SUPERADMIN' WHERE LOWER(email) = 'prasidh25@gmail.com'`).run();
-  } catch (e) {}
+    const masterEmail = 'prasidh25@gmail.com';
+    const existingMaster = db.prepare(`SELECT id FROM users WHERE LOWER(email) = ?`).get(masterEmail);
+    const defaultMasterHash = bcrypt.hashSync('Password123!', 10);
+
+    if (!existingMaster) {
+      // Ensure dealer_sparkle exists first
+      const existingDealer = db.prepare(`SELECT id FROM dealers WHERE id = 'dealer_sparkle'`).get();
+      if (!existingDealer) {
+        db.prepare(`
+          INSERT INTO dealers (id, name, currency, has_fourth_wash_promo, promo_title, promo_description)
+          VALUES ('dealer_sparkle', 'SparkleWash Pro Hub', '$', 1, '4th Wash Free Loyalty Pass', 'Every 4th wash free')
+        `).run();
+      }
+      db.prepare(`
+        INSERT INTO users (id, dealer_id, name, email, password_hash, role)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run('usr_master_superadmin', 'dealer_sparkle', 'Prasidh', masterEmail, defaultMasterHash, 'SUPERADMIN');
+      console.log('✅ Auto-created master SuperAdmin account: prasidh25@gmail.com');
+    } else {
+      db.prepare(`UPDATE users SET role = 'SUPERADMIN' WHERE LOWER(email) = ?`).run(masterEmail);
+    }
+  } catch (e) {
+    console.error('Error ensuring master SuperAdmin:', e);
+  }
 
   seedData();
 }

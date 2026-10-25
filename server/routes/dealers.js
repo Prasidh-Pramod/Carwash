@@ -116,10 +116,18 @@ router.put('/:id', (req, res) => {
           technicians_json = COALESCE(?, technicians_json)
       WHERE id = ?
     `).run(
-      name, phone, email, address, city, currency, whatsapp_phone, 
+      name ?? null, 
+      phone ?? null, 
+      email ?? null, 
+      address ?? null, 
+      city ?? null, 
+      currency ?? null, 
+      whatsapp_phone ?? null, 
       has_fourth_wash_promo !== undefined ? (has_fourth_wash_promo ? 1 : 0) : null,
-      promo_title, promo_description,
-      baysJson, techniciansJson,
+      promo_title ?? null, 
+      promo_description ?? null,
+      baysJson ?? null, 
+      techniciansJson ?? null,
       req.params.id
     );
 

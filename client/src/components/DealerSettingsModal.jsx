@@ -48,6 +48,7 @@ export default function DealerSettingsModal({
   // Dealership info state
   const [name, setName] = useState(dealer?.name || '');
   const [phone, setPhone] = useState(dealer?.phone || '');
+  const [email, setEmail] = useState(dealer?.email || '');
   const [address, setAddress] = useState(dealer?.address || '');
   const [city, setCity] = useState(dealer?.city || '');
   const [currency, setCurrency] = useState(dealer?.currency || '$');
@@ -86,6 +87,7 @@ export default function DealerSettingsModal({
       await onUpdateDealer(dealer.id, {
         name,
         phone,
+        email,
         address,
         city,
         currency,
@@ -363,7 +365,7 @@ export default function DealerSettingsModal({
               Dealership Profile Details
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="text-xs font-semibold text-slate-700 block mb-1">Car Wash Name</label>
                 <input
@@ -379,6 +381,15 @@ export default function DealerSettingsModal({
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 block mb-1">Contact Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-blue-600"
                 />
               </div>

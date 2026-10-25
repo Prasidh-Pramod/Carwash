@@ -32,7 +32,11 @@ router.get('/', (req, res) => {
         v.make as vehicle_make,
         v.model as vehicle_model,
         d.currency as dealer_currency,
-        d.name as dealer_name
+        d.name as dealer_name,
+        d.phone as dealer_phone,
+        d.email as dealer_email,
+        d.address as dealer_address,
+        d.city as dealer_city
       FROM invoices i
       JOIN washes w ON w.id = i.wash_id
       JOIN customers c ON c.id = i.customer_id

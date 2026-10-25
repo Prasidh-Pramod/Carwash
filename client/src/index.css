@@ -36,23 +36,76 @@
 }
 
 @media print {
-  /* Complete isolation of print area: hide background app */
+  /* Complete isolation of print area: hide background app nav, main and screen buttons */
   nav,
   main,
   aside,
   header,
   footer,
-  #root > *:not(.fixed),
   .print-hidden,
   .print\:hidden {
     display: none !important;
   }
 
-  body {
+  html, body {
     background-color: #ffffff !important;
     color: #000000 !important;
     margin: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #root, #root > div {
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+  }
+
+  /* Receipt Modal Container in print mode */
+  .receipt-modal-backdrop {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    width: 100% !important;
+  }
+
+  .receipt-modal-content {
+    border: none !important;
+    box-shadow: none !important;
+    max-height: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    display: block !important;
+  }
+
+  .receipt-print-area {
+    display: block !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 8px !important;
+    margin: 0 !important;
+  }
+
+  /* Force exact colors & borders on thermal & laser printers */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Force clean page breaks between duplicate receipt copies */
@@ -60,11 +113,12 @@
     page-break-after: always !important;
     break-after: page !important;
     margin: 0 !important;
-    padding: 20px 0 !important;
+    padding: 24px 0 !important;
   }
 
   .receipt-copy:last-child {
     page-break-after: avoid !important;
     break-after: avoid !important;
+    padding-bottom: 0 !important;
   }
 }

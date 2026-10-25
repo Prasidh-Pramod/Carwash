@@ -13,6 +13,11 @@ import {
 } from 'lucide-react';
 
 function ReceiptBody({ invoice, isPaid, isFree, copyTitle }) {
+  const currency = invoice.dealer_currency || '$';
+  const subtotal = Number(invoice.subtotal || 0);
+  const addonsTotal = (invoice.addons || []).reduce((s, a) => s + (Number(a.price) || 0), 0);
+  const basePrice = Math.max(0, subtotal - addonsTotal);
+
   return (
     <div className="space-y-5 text-slate-800 print:text-black">
       {copyTitle && (
@@ -29,11 +34,15 @@ function ReceiptBody({ invoice, isPaid, isFree, copyTitle }) {
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-slate-900 print:text-black tracking-tight">
-              {invoice.dealer_name}
+              {invoice.dealer_name || 'Car Wash Operations'}
             </span>
           </div>
-          <p className="text-xs text-slate-500 print:text-slate-600 mt-0.5">{invoice.dealer_address}, {invoice.dealer_city}</p>
-          <p className="text-xs text-slate-500 print:text-slate-600">Phone: {invoice.dealer_phone}</p>
+          <p className="text-xs text-slate-500 print:text-slate-600 mt-0.5">
+            {invoice.dealer_address ? `${invoice.dealer_address}, ${invoice.dealer_city || ''}` : (invoice.dealer_city || 'Main Car Wash Facility')}
+          </p>
+          <p className="text-xs text-slate-500 print:text-slate-600">
+            Phone: {invoice.dealer_phone || '+1 (555) 789-0123'}
+          </p>
         </div>
 
         <div className="sm:text-right">
@@ -113,7 +122,7 @@ function ReceiptBody({ invoice, isPaid, isFree, copyTitle }) {
             <div className="text-[10px] text-slate-500 print:text-slate-600">Full vehicle wash & bay treatment</div>
           </div>
           <div className="font-mono font-semibold text-slate-900 print:text-black">
-            {invoice.dealer_currency}{Number(invoice.subtotal - (invoice.addons?.reduce((s, a) => s + a.price, 0) || 0)).toFixed(2)}
+            {currency}{basePrice.toFixed(2)}
           </div>
         </div>
 
@@ -124,7 +133,7 @@ function ReceiptBody({ invoice, isPaid, isFree, copyTitle }) {
               + {ad.name}
             </div>
             <div className="font-mono text-slate-700 print:text-slate-700">
-              {invoice.dealer_currency}{Number(ad.price).toFixed(2)}
+              {currency}{Number(ad.price || 0).toFixed(2)}
             </div>
           </div>
         ))}
@@ -133,25 +142,25 @@ function ReceiptBody({ invoice, isPaid, isFree, copyTitle }) {
         <div className="border-t border-slate-200 print:border-slate-300 pt-3 space-y-1.5 text-xs">
           <div className="flex justify-between text-slate-500 print:text-slate-600">
             <span>Subtotal</span>
-            <span className="font-mono">{invoice.dealer_currency}{Number(invoice.subtotal).toFixed(2)}</span>
+            <span className="font-mono">{currency}{Number(invoice.subtotal || 0).toFixed(2)}</span>
           </div>
 
           {Number(invoice.discount) > 0 && (
             <div className="flex justify-between text-amber-700 print:text-black font-bold">
               <span>Loyalty Discount (4th Wash Free)</span>
-              <span className="font-mono">-{invoice.dealer_currency}{Number(invoice.discount).toFixed(2)}</span>
+              <span className="font-mono">-{currency}{Number(invoice.discount || 0).toFixed(2)}</span>
             </div>
           )}
 
           <div className="flex justify-between text-slate-500 print:text-slate-600">
             <span>Sales Tax (8%)</span>
-            <span className="font-mono">{invoice.dealer_currency}{Number(invoice.tax).toFixed(2)}</span>
+            <span className="font-mono">{currency}{Number(invoice.tax || 0).toFixed(2)}</span>
           </div>
 
           {/* Grand Total */}
           <div className="flex justify-between text-base font-extrabold text-slate-900 print:text-black pt-2 border-t border-slate-200 print:border-slate-400">
             <span>Total Amount</span>
-            <span className="font-mono">{invoice.dealer_currency}{Number(invoice.total).toFixed(2)}</span>
+            <span className="font-mono">{currency}{Number(invoice.total || 0).toFixed(2)}</span>
           </div>
         </div>
       </div>
@@ -204,11 +213,11 @@ export default function InvoiceDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white print:static">
-      <div className="bg-white border border-slate-200 w-full max-w-xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden print:border-none print:shadow-none print:bg-white print:text-black print:max-h-none print:overflow-visible">
+    <div className="receipt-modal-backdrop fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white print:static">
+      <div className="receipt-modal-content bg-white border border-slate-200 w-full max-w-xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden print:border-none print:shadow-none print:bg-white print:text-black print:max-h-none print:overflow-visible">
         
         {/* Modal Controls (Pinned Header - Hidden in Print) */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-b border-slate-200 bg-slate-50 shrink-0 print:hidden">
+        <div className="print-hidden flex items-center justify-between px-6 py-3.5 border-b border-slate-200 bg-slate-50 shrink-0 print:hidden">
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-blue-600" />
             <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -246,7 +255,7 @@ export default function InvoiceDetailModal({
         </div>
 
         {/* SCREEN VIEW (Single clean card with WhatsApp & payment actions) */}
-        <div className="print:hidden flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 text-slate-800">
+        <div className="print-hidden print:hidden flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 text-slate-800">
           <ReceiptBody invoice={invoice} isPaid={isPaid} isFree={isFree} copyTitle="OFFICIAL RECEIPT" />
 
           {/* WHATSAPP ACTION BUTTONS */}
@@ -319,7 +328,7 @@ export default function InvoiceDetailModal({
         </div>
 
         {/* PRINT ONLY VIEW (Prints EXACTLY 3 Copies in Triplicate, or 1 Copy) */}
-        <div className="hidden print:block text-black bg-white p-4">
+        <div className="receipt-print-area hidden print:block text-black bg-white p-4">
           {copyCount === '3' ? (
             <>
               {/* Copy 1: Customer Copy */}
